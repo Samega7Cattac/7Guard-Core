@@ -33,7 +33,7 @@ To decrypt it's just inverting the sum.
 original_file = crypted_file - random_number
 ```
 
-The problem with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.
+The problems with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.
 
 1) The problem was solved by using the Intel functions to generate random numbers in hardware level (more info [here](https://en.wikipedia.org/wiki/RdRand)).
 
