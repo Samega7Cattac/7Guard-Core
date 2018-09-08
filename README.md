@@ -23,8 +23,8 @@ g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd
 ```
 file_to_crypt + random_number = crypted_file
                       |               |
-                      |                -->Stored was crypted file
-                       ------------------>Stored was key file
+                      |                -->Stored in crypted file (*.7cy)
+                       ------------------>Stored in key file (*.7ky)
 ```
 
 To decrypt it's just inverting the sum.
