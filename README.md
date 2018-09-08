@@ -18,7 +18,7 @@ g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd
 
 ## How it work
 
-7Guard use a encryption tecnique called [OTP](https://en.wikipedia.org/wiki/One-time_pad) (One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number user to the key file.
+7Guard use a encryption tecnique called [OTP](https://en.wikipedia.org/wiki/One-time_pad) (One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number used to the key file.
 
 ```
 file_to_crypt + random_number = crypted_file
@@ -33,7 +33,7 @@ To decrypt it's just inverting the sum.
 original_file = crypted_file - random_number
 ```
 
-The problem with this tecnique are 1) Generation of truly random numbers, and 2) The crypted and key file will have the same size of the original one.
+The problem with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.
 
 1) The problem was solved by using the Intel functions to generate random numbers in hardware level (more info [here](https://en.wikipedia.org/wiki/RdRand)).
 
