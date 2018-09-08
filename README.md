@@ -3,7 +3,9 @@
 
 ## Getting Started
 
-For Windows you can download the pre-compiled executable
+For Windows you can download the pre-compiled executable.
+
+
 For linux you need to download the source code and have `g++` pre-installed.
 Extract the .tar.gz file somewhere and open a terminal to compile the code:
 
