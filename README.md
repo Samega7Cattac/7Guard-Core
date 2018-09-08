@@ -5,7 +5,7 @@
 
 For Windows you can download the pre-compiled executable.
 
-You also can compile it using Developer Command Prompt for VS 2017 explained [here](https://docs.microsoft.com/pt-pt/cpp/build/walkthrough-compiling-a-native-cpp-program-on-the-command-line?view=vs-2017#open-a-developer-command-prompt) or creating a `c++ empty project` on Visual Studio and adding the files to it.
+You also can compile it using `Developer Command Prompt for VS 2017` explained [here](https://docs.microsoft.com/pt-pt/cpp/build/walkthrough-compiling-a-native-cpp-program-on-the-command-line?view=vs-2017#open-a-developer-command-prompt) or creating a `c++ empty project` on Visual Studio and adding the files to it.
 
 
 For linux you need to download the source code and have `g++` installed.
@@ -18,7 +18,7 @@ g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd
 
 ## How it work
 
-7Guard use a encryption tecnique called [OTP](https://en.wikipedia.org/wiki/One-time_pad)(One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number user to the key file.
+7Guard use a encryption tecnique called [OTP](https://en.wikipedia.org/wiki/One-time_pad) (One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number user to the key file.
 
 ```
 file_to_crypt + random_number = crypted_file
