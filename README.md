@@ -45,14 +45,14 @@ The problems with this tecnique are 1.) Generation of truly random numbers, and 
 Options:
         -crypt - path to the file to crypt
         -decrypt - path to the crypted file
-        -key - path to the key file (only with "-decypt")
+        -key - path to the key file (only with "-decrypt")
         -h - display this help message
 Usage:
         7Guard_CLI_v1b.exe [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky]
 
 Optional:
         -o - Path to output folder
-        --buf - specify buffer size (O = max)
+        --buf - specify the size used each of the 2 buffers (O = max)
 ```
 
 ## Versioning
