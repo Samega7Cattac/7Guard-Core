@@ -4,7 +4,7 @@
  *
  * @author Samega 7Cattac
  *
- * @version 1b
+ * @version 1.1b
  *
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
@@ -12,7 +12,7 @@
 
 int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, unsigned long long size, bool max)
 {
-	if (size < 2) return 0;
+	if (size < 1) return 0;
 	if (max)
 	{
 		bool done = false;
@@ -38,7 +38,7 @@ int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, unsigned long lon
 			}
 		}
 		if (!done) return 0;
-		cout << "[INFO] Buffers size = " << last_try * 2 << endl;
+		cout << "[INFO] Buffers size = " << last_try << endl;
 		return last_try;
 	}
 	else
@@ -52,7 +52,7 @@ int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, unsigned long lon
 		{
 			return 0;
 		}
-		cout << "[INFO] Buffers size = " << size * 2 << endl;
+		cout << "[INFO] Buffers size = " << size << endl;
 		return size;
 	}
 }
@@ -81,7 +81,6 @@ string otp_s7c::GetFileName(string path)
 
 int otp_s7c::crypt(string Filename, string output, unsigned long long buf_size)
 {
-	cout << "[INFO] Initializing..." << endl;
 	int error = 0;
 	FILE * filename = fopen(Filename.c_str(), "rb");
 	if (filename)
@@ -118,7 +117,7 @@ int otp_s7c::crypt(string Filename, string output, unsigned long long buf_size)
 					cout << "[INFO] Buffers size set to \"auto\"\n";
 					buf_size = otp_s7c::alloc(&buf, &num, size, true);
 				}
-				else buf_size = otp_s7c::alloc(&buf, &num, buf_size, false);
+				else buf_size = otp_s7c::alloc(&buf, &num, (buf_size > size ? size : buf_size), false);
 				if (buf_size)
 				{
 					unsigned short val = 0;

@@ -4,7 +4,7 @@
  *
  * @author Samega 7Cattac
  *
- * @version 1b
+ * @version 1.1b
  *
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
@@ -24,6 +24,7 @@ void cred();
 int main(int argc, char * argv[])
 {
 	cout << endl;
+	cout << "[INFO] Initializing..." << endl;
 	if (argc > 1)
 	{
 		int crypt = 0;
@@ -34,12 +35,78 @@ int main(int argc, char * argv[])
 		bool h = false;
 		for (int i = 1; i < argc; i++)
 		{
-			if ((string)argv[i] == "-crypt") crypt = ++i;
-			else if ((string)argv[i] == "-decrypt") decrypt = ++i;
-			else if ((string)argv[i] == "-key") key = ++i;
-			else if ((string)argv[i] == "-o") o = ++i;
-			else if ((string)argv[i] == "--buf") buf = ++i;
+			if ((string)argv[i] == "-crypt")
+				if (!crypt)
+					if(argc > i + 1) crypt = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"-crypt\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"-crypt\" args!" << endl;
+					return -9;
+				}
+			else if ((string)argv[i] == "-decrypt")
+				if (!decrypt)
+					if (argc > i + 1) decrypt = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"-decrypt\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"-decrypt\" args!" << endl;
+					return -9;
+				}
+			else if ((string)argv[i] == "-key")
+				if (!key)
+					if (argc > i + 1) key = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"-key\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"-key\" args!" << endl;
+					return -9;
+				}
+			else if ((string)argv[i] == "-o")
+				if (!o)
+					if (argc > i + 1) o = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"-o\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"-o\" args!" << endl;
+					return -9;
+				}
+			else if ((string)argv[i] == "--buf")
+				if (!buf)
+					if (!(argc < i + 1)) buf = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"-buf\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"-buf\" args!" << endl;
+					return -9;
+				}
 			else if ((string)argv[i] == "-h") h = true;
+			else
+			{
+				cout << "[ERROR] Invalid option \"" << argv[i] << "\"!" << endl;
+				cout << "use option \"-h\" for help" << endl;
+				return -9;
+			}
 		}
 		otp_s7c s7c;
 		if ((crypt && decrypt) || (crypt || decrypt) && h)
@@ -51,7 +118,7 @@ int main(int argc, char * argv[])
 		else if (crypt)
 		{
 			if (key) cout << "[WARNING] \"-key\" option will be ignored" << endl;
-			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10) / 2));
+			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
 		}
 		else if (decrypt)
 		{
@@ -60,7 +127,7 @@ int main(int argc, char * argv[])
 				cout << "[ERROR] Missing \"-key\" option!" << endl;
 				return -2;
 			}
-			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10) / 2));
+			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
 		}
 	}
 	else cred();
@@ -83,7 +150,7 @@ void help(char * call)
 	cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky]" << endl;
 	cout << endl << "Optional:" << endl;
 	cout << '\t' << "-o - Path to output folder" << endl;
-	cout << '\t' << "--buf - specify buffer size (O = max)" << endl;
+	cout << '\t' << "--buf - specify the size used each of the 2 buffers (O = max)" << endl;
 }
 
 /**

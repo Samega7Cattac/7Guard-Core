@@ -4,7 +4,7 @@
  *
  * @author Samega 7Cattac
  *
- * @version 1b
+ * @version 1.1b
  *
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
