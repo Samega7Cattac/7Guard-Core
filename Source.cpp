@@ -4,7 +4,7 @@
  *
  * @author Samega 7Cattac
  *
- * @version 1.1b
+ * @version 1.2
  *
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
@@ -24,7 +24,6 @@ void cred();
 int main(int argc, char * argv[])
 {
 	cout << endl;
-	cout << "[INFO] Initializing..." << endl;
 	if (argc > 1)
 	{
 		int crypt = 0;
@@ -118,6 +117,7 @@ int main(int argc, char * argv[])
 		else if (crypt)
 		{
 			if (key) cout << "[WARNING] \"-key\" option will be ignored" << endl;
+			cout << "[INFO] Initializing..." << endl;
 			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
 		}
 		else if (decrypt)
@@ -127,6 +127,7 @@ int main(int argc, char * argv[])
 				cout << "[ERROR] Missing \"-key\" option!" << endl;
 				return -2;
 			}
+			cout << "[INFO] Initializing..." << endl;
 			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
 		}
 	}
@@ -158,8 +159,15 @@ void help(char * call)
 */
 void cred()
 {
+	cout << "_________  ________                       .___" << endl;
+	cout << "\\______  \\/  _____/ __ _______ _______  __| _/" << endl;
+	cout << "    /    /   \\  ___|  |  \\__  \\\\_  __ \\/ __ |" << endl;
+	cout << "   /    /\\    \\_\\  \\  |  // __ \\|  | \\/ /_/ |" << endl;
+	cout << "  /____/  \\______  /____/(____  /__|  \\____ |" << endl;
+	cout << "                 \\/           \\/           \\/" << endl;
 	cout << "7Guard - OTP encryption software" << endl;
 	cout << "By: Samega 7Cattac" << endl;
+	cout << endl << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << endl;
 	cout << endl << "use option \"-h\" for help" << endl;
 	cout << endl << "7Guard Copyright (C) 2018 Samega 7Cattac" << endl;
 }
