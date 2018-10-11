@@ -9,6 +9,7 @@
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
 #define BUFFER_SIZE 99999 // Default size of the buffers
+#define N_BUFFER 10240
 #include "otp_s7c.h"
 
 void help(char * call);
@@ -31,6 +32,7 @@ int main(int argc, char * argv[])
 		int key = 0;
 		int o = 0;
 		int buf = 0;
+		int threads = 0;
 		bool h = false;
 		for (int i = 1; i < argc; i++)
 		{
@@ -91,12 +93,25 @@ int main(int argc, char * argv[])
 					if (!(argc < i + 1)) buf = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"-buf\" value!" << endl;
+						cout << "[ERROR] Missing \"--buf\" value!" << endl;
 						return -9;
 					}
 				else
 				{
-					cout << "[ERROR] Multiple \"-buf\" args!" << endl;
+					cout << "[ERROR] Multiple \"--buf\" args!" << endl;
+					return -9;
+				}
+			else if ((string)argv[i] == "--threads")
+				if (!threads)
+					if (!(argc < i + 1)) threads = ++i;
+					else
+					{
+						cout << "[ERROR] Missing \"--threads\" value!" << endl;
+						return -9;
+					}
+				else
+				{
+					cout << "[ERROR] Multiple \"--threads\" args!" << endl;
 					return -9;
 				}
 			else if ((string)argv[i] == "-h") h = true;
@@ -118,7 +133,7 @@ int main(int argc, char * argv[])
 		{
 			if (key) cout << "[WARNING] \"-key\" option will be ignored" << endl;
 			cout << "[INFO] Initializing..." << endl;
-			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
+			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))));
 		}
 		else if (decrypt)
 		{
@@ -128,7 +143,7 @@ int main(int argc, char * argv[])
 				return -2;
 			}
 			cout << "[INFO] Initializing..." << endl;
-			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)));
+			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))));
 		}
 	}
 	else cred();
@@ -148,10 +163,12 @@ void help(char * call)
 	cout << '\t' << "-key - path to the key file (only with \"-decypt\")" << endl;
 	cout << '\t' << "-h - display this help message" << endl;
 	cout << "Usage:" << endl;
-	cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky]" << endl;
+	cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky>]" << endl;
 	cout << endl << "Optional:" << endl;
 	cout << '\t' << "-o - Path to output folder" << endl;
 	cout << '\t' << "--buf - specify the size used each of the 2 buffers (O = max)" << endl;
+	cout << '\t' << "--threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)" << endl;
+	cout << '\t' << '\t' << "(Only high-end CPUs recomendaded)" << endl;
 }
 
 /**
@@ -168,6 +185,7 @@ void cred()
 	cout << "7Guard - OTP encryption software" << endl;
 	cout << "By: Samega 7Cattac" << endl;
 	cout << endl << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << endl;
+	cout << "Discord: Samega 7Cattac#5966" << endl;
 	cout << endl << "use option \"-h\" for help" << endl;
 	cout << endl << "7Guard Copyright (C) 2018 Samega 7Cattac" << endl;
 }
