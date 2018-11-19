@@ -1,6 +1,6 @@
 /**
  * @file Source.cpp
- * Purpose: File with the functions for help, credits and to handle the inputs
+ * Purpose: File with the main functions
  *
  * @author Samega 7Cattac
  *
@@ -10,8 +10,11 @@
  */
 #define BUFFER_SIZE 99999 // Default size of the buffers
 #define N_BUFFER 10240
+#define BUF_MAX 4294967295
+#define TIME_MAX 59
 #include "otp_s7c.h"
 
+bool checks(long buf, long threads, long time);
 void help(char * call);
 void cred();
 
@@ -24,130 +27,203 @@ void cred();
 */
 int main(int argc, char * argv[])
 {
-	cout << endl;
+	std::cout << std::endl;
 	if (argc > 1)
 	{
-		int crypt = 0;
-		int decrypt = 0;
-		int key = 0;
-		int o = 0;
-		int buf = 0;
-		int threads = 0;
+		unsigned int crypt = 0;
+		unsigned int decrypt = 0;
+		unsigned int key = 0;
+		unsigned int o = 0;
+		unsigned int t = 0;
+		unsigned int buf = 0;
+		unsigned int threads = 0;
 		bool h = false;
 		for (int i = 1; i < argc; i++)
 		{
-			if ((string)argv[i] == "-crypt")
-				if (!crypt)
-					if(argc > i + 1) crypt = ++i;
-					else
-					{
-						cout << "[ERROR] Missing \"-crypt\" value!" << endl;
-						return -9;
-					}
-				else
+			if ((std::string)argv[i] == "-crypt")
+			{
+				if (crypt)
 				{
-					cout << "[ERROR] Multiple \"-crypt\" args!" << endl;
+					std::cout << "[ERROR] Multiple \"-crypt\" args!" << std::endl;
 					return -9;
 				}
-			else if ((string)argv[i] == "-decrypt")
-				if (!decrypt)
+				else
+				{
+					if (argc > i + 1) crypt = ++i;
+					else
+					{
+						std::cout << "[ERROR] Missing \"-crypt\" value!" << std::endl;
+						return -9;
+					}
+				}
+			}
+			else if ((std::string)argv[i] == "-decrypt")
+			{
+				if (decrypt)
+				{
+					std::cout << "[ERROR] Multiple \"-decrypt\" args!" << std::endl;
+					return -9;
+				}
+				else
+				{
 					if (argc > i + 1) decrypt = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"-decrypt\" value!" << endl;
+						std::cout << "[ERROR] Missing \"-decrypt\" value!" << std::endl;
 						return -9;
 					}
-				else
+				}
+			}
+			else if ((std::string)argv[i] == "-key")
+			{
+				if (key)
 				{
-					cout << "[ERROR] Multiple \"-decrypt\" args!" << endl;
+					std::cout << "[ERROR] Multiple \"-key\" args!" << std::endl;
 					return -9;
 				}
-			else if ((string)argv[i] == "-key")
-				if (!key)
+				else
+				{
 					if (argc > i + 1) key = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"-key\" value!" << endl;
+						std::cout << "[ERROR] Missing \"-key\" value!" << std::endl;
 						return -9;
 					}
-				else
+				}
+			}
+			else if ((std::string)argv[i] == "-o")
+			{
+				if (o)
 				{
-					cout << "[ERROR] Multiple \"-key\" args!" << endl;
+					std::cout << "[ERROR] Multiple \"-o\" args!" << std::endl;
 					return -9;
 				}
-			else if ((string)argv[i] == "-o")
-				if (!o)
+				else
+				{
 					if (argc > i + 1) o = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"-o\" value!" << endl;
+						std::cout << "[ERROR] Missing \"-o\" value!" << std::endl;
 						return -9;
 					}
-				else
+				}
+			}
+			else if ((std::string)argv[i] == "-t")
+			{
+				if (t)
 				{
-					cout << "[ERROR] Multiple \"-o\" args!" << endl;
+					std::cout << "[ERROR] Multiple \"-t\" args!" << std::endl;
 					return -9;
 				}
-			else if ((string)argv[i] == "--buf")
-				if (!buf)
+				else
+				{
+					if (!(argc < i + 1)) t = ++i;
+					else
+					{
+						std::cout << "[ERROR] Missing \"-t\" value!" << std::endl;
+						return -9;
+					}
+				}
+			}
+			else if ((std::string)argv[i] == "--buf")
+			{
+				if (buf)
+				{
+					std::cout << "[ERROR] Multiple \"--buf\" args!" << std::endl;
+					return -9;
+				}
+				else
+				{
 					if (!(argc < i + 1)) buf = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"--buf\" value!" << endl;
+						std::cout << "[ERROR] Missing \"--buf\" value!" << std::endl;
 						return -9;
 					}
-				else
+				}
+			}
+			else if ((std::string)argv[i] == "--threads")
+			{
+				if (threads)
 				{
-					cout << "[ERROR] Multiple \"--buf\" args!" << endl;
+					std::cout << "[ERROR] Multiple \"--threads\" args!" << std::endl;
 					return -9;
 				}
-			else if ((string)argv[i] == "--threads")
-				if (!threads)
+				else
+				{
 					if (!(argc < i + 1)) threads = ++i;
 					else
 					{
-						cout << "[ERROR] Missing \"--threads\" value!" << endl;
+						std::cout << "[ERROR] Missing \"--threads\" value!" << std::endl;
 						return -9;
 					}
-				else
-				{
-					cout << "[ERROR] Multiple \"--threads\" args!" << endl;
-					return -9;
 				}
-			else if ((string)argv[i] == "-h") h = true;
+			}
+			else if ((std::string)argv[i] == "-h") h = true;
 			else
 			{
-				cout << "[ERROR] Invalid option \"" << argv[i] << "\"!" << endl;
-				cout << "use option \"-h\" for help" << endl;
+				std::cout << "[ERROR] Invalid option \"" << argv[i] << "\"!" << std::endl;
+				std::cout << "use option \"-h\" for help" << std::endl;
 				return -9;
 			}
 		}
 		otp_s7c s7c;
 		if ((crypt && decrypt) || (crypt || decrypt) && h)
 		{
-			cout << "[ERROR] Select only 1 mode (crypt | decrypt | help)!" << endl;
-			return -1;
+			std::cout << "[ERROR] Select only 1 mode (crypt | decrypt | help)!" << std::endl;
+			return -9;
 		}
 		else if (h) help(argv[0]);
 		else if (crypt)
 		{
-			if (key) cout << "[WARNING] \"-key\" option will be ignored" << endl;
-			cout << "[INFO] Initializing..." << endl;
-			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))));
+			if (key) std::cout << "[WARNING] \"-key\" option will be ignored" << std::endl;
+			std::cout << "[INFO] Initializing..." << std::endl;
+			if (checks(atoi(argv[buf]), (!threads ? 0 : atoi(argv[threads])), atoi(argv[t]))) return -9;
+			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((std::string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))), (!t ? 1 : atoi(argv[t])));
 		}
 		else if (decrypt)
 		{
 			if (!key)
 			{
-				cout << "[ERROR] Missing \"-key\" option!" << endl;
-				return -2;
+				std::cout << "[ERROR] Missing \"-key\" option!" << std::endl;
+				return -9;
 			}
-			cout << "[INFO] Initializing..." << endl;
-			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))));
+			else if (threads) std::cout << "[WARNING] \"--threads\" option will be ignored" << std::endl;
+			std::cout << "[INFO] Initializing..." << std::endl;
+			if (checks(atoi(argv[buf]), atoi(argv[threads]), atoi(argv[t]))) return -9;
+			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!t ? 1 : atoi(argv[t])));
 		}
 	}
 	else cred();
 	return 0;
+}
+
+/**
+	Check the range of the numeric inputs.
+
+	@param[in] buf Counts the number of inputs.
+	@param[in] threads Inputs from the user.
+	@param[in] time Inputs from the user.
+	@return 0 if success or negative if fail.
+*/
+bool checks(long buf, long threads, long time)
+{
+	if (buf < 0 || buf > BUF_MAX)
+	{
+		std::cout << "[ERROR] Invalid buf size! [0 - " << BUF_MAX << "]" << std::endl;
+		return true;
+	}
+	else if (threads < 0 || threads > BUF_MAX)
+	{
+		std::cout << "[ERROR] Invalid threads number! [0 - " << BUF_MAX << "]" << std::endl;
+		return true;
+	}
+	else if (time < 0 || time > TIME_MAX)
+	{
+		std::cout << "[ERROR] Invalid refresh time! [0 - " << TIME_MAX << "]" << std::endl;
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -157,18 +233,19 @@ int main(int argc, char * argv[])
 */
 void help(char * call)
 {
-	cout << "Options:" << endl;
-	cout << '\t' << "-crypt - path to the file to crypt" << endl;
-	cout << '\t' << "-decrypt - path to the crypted file" << endl;
-	cout << '\t' << "-key - path to the key file (only with \"-decypt\")" << endl;
-	cout << '\t' << "-h - display this help message" << endl;
-	cout << "Usage:" << endl;
-	cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky>]" << endl;
-	cout << endl << "Optional:" << endl;
-	cout << '\t' << "-o - Path to output folder" << endl;
-	cout << '\t' << "--buf - specify the size used each of the 2 buffers (O = max)" << endl;
-	cout << '\t' << "--threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)" << endl;
-	cout << '\t' << '\t' << "(Only high-end CPUs recomendaded)" << endl;
+	std::cout << "Options:" << '\n';
+	std::cout << '\t' << "-crypt - path to the file to crypt" << '\n';
+	std::cout << '\t' << "-decrypt - path to the crypted file" << '\n';
+	std::cout << '\t' << "-key - path to the key file (only with \"-decypt\")" << '\n';
+	std::cout << '\t' << "-h - display this help message" << '\n';
+	std::cout << "Usage:" << '\n';
+	std::cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky>]" << '\n';
+	std::cout << '\n' << "Optional:" << '\n';
+	std::cout << '\t' << "-o - Path to output folder" << '\n';
+	std::cout << '\t' << "-t - refresh time in seconds" << '\n';
+	std::cout << '\t' << "--buf - specify the size used each of the 2 buffers (O = max)" << '\n';
+	std::cout << '\t' << "--threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)" << '\n';
+	std::cout << '\t' << '\t' << "(Only high-end CPUs recomendaded)" << std::endl;
 }
 
 /**
@@ -176,16 +253,16 @@ void help(char * call)
 */
 void cred()
 {
-	cout << "_________  ________                       .___" << endl;
-	cout << "\\______  \\/  _____/ __ _______ _______  __| _/" << endl;
-	cout << "    /    /   \\  ___|  |  \\__  \\\\_  __ \\/ __ |" << endl;
-	cout << "   /    /\\    \\_\\  \\  |  // __ \\|  | \\/ /_/ |" << endl;
-	cout << "  /____/  \\______  /____/(____  /__|  \\____ |" << endl;
-	cout << "                 \\/           \\/           \\/" << endl;
-	cout << "7Guard - OTP encryption software" << endl;
-	cout << "By: Samega 7Cattac" << endl;
-	cout << endl << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << endl;
-	cout << "Discord: Samega 7Cattac#5966" << endl;
-	cout << endl << "use option \"-h\" for help" << endl;
-	cout << endl << "7Guard Copyright (C) 2018 Samega 7Cattac" << endl;
+	std::cout << "_________  ________                       .___" << '\n';
+	std::cout << "\\______  \\/  _____/ __ _______ _______  __| _/" << '\n';
+	std::cout << "    /    /   \\  ___|  |  \\__  \\\\_  __ \\/ __ |" << '\n';
+	std::cout << "   /    /\\    \\_\\  \\  |  // __ \\|  | \\/ /_/ |" << '\n';
+	std::cout << "  /____/  \\______  /____/(____  /__|  \\____ |" << '\n';
+	std::cout << "                 \\/           \\/           \\/" << '\n';
+	std::cout << "7Guard - OTP encryption software" << '\n';
+	std::cout << "By: Samega 7Cattac" << '\n';
+	std::cout << '\n' << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << '\n';
+	std::cout << "Discord: Samega 7Cattac#5966" << '\n';
+	std::cout << '\n' << "use option \"-h\" for help" << '\n';
+	std::cout << '\n' << "7Guard Copyright (C) 2018 Samega 7Cattac" << std::endl;
 }
