@@ -53,6 +53,8 @@ Usage:
 Optional:
         -o - Path to output folder
         --buf - specify the size used each of the 2 buffers (O = max)
+        --threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)
+                (Only high-end CPUs recomendaded)
 ```
 
 ## Versioning
