@@ -8,7 +8,9 @@
  *
  * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
  */
-#if __linux__
+#if defined(_M_AMD64) && defined(_WIN32)
+#define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
+#elif __linux__
 #include <cstring> // memset() (Only for linux)
 #endif
 #include <immintrin.h> // _rdrand16_step()

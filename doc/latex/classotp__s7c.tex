@@ -1,0 +1,85 @@
+\hypertarget{classotp__s7c}{}\section{otp\+\_\+s7c Class Reference}
+\label{classotp__s7c}\index{otp\+\_\+s7c@{otp\+\_\+s7c}}
+
+
+{\ttfamily \#include $<$otp\+\_\+s7c.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{classotp__s7c_a0a44785b6625d14e143b618e678b8fa6}{crypt}} (std\+::string Filename, std\+::string output, size\+\_\+t buf\+\_\+size, unsigned int threads, unsigned int time)
+\item 
+int \mbox{\hyperlink{classotp__s7c_ae97c0aad52d688f1aff95fa6c7d7d743}{decrypt}} (std\+::string Filename, std\+::string key, std\+::string output, size\+\_\+t buf\+\_\+size, unsigned int time)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 22 of file otp\+\_\+s7c.\+h.
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classotp__s7c_a0a44785b6625d14e143b618e678b8fa6}\label{classotp__s7c_a0a44785b6625d14e143b618e678b8fa6}} 
+\index{otp\+\_\+s7c@{otp\+\_\+s7c}!crypt@{crypt}}
+\index{crypt@{crypt}!otp\+\_\+s7c@{otp\+\_\+s7c}}
+\subsubsection{\texorpdfstring{crypt()}{crypt()}}
+{\footnotesize\ttfamily int otp\+\_\+s7c\+::crypt (\begin{DoxyParamCaption}\item[{std\+::string}]{Filename,  }\item[{std\+::string}]{output,  }\item[{size\+\_\+t}]{buf\+\_\+size,  }\item[{unsigned int}]{threads,  }\item[{unsigned int}]{time }\end{DoxyParamCaption})}
+
+Function with the ops to crypt a file.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em Filename} & Path to the file to crypt. \\
+\hline
+\mbox{\tt in}  & {\em output} & Path to the folder to output (if == \char`\"{}\char`\"{} then use the Filename path). \\
+\hline
+\mbox{\tt in}  & {\em buf\+\_\+size} & Size of the buffers. \\
+\hline
+\mbox{\tt in}  & {\em threads} & Number max of block in queue. \\
+\hline
+\mbox{\tt in}  & {\em time} & Time (in seconds) to refresh the percentage. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success or negative if fail. 
+\end{DoxyReturn}
+
+
+Definition at line 84 of file otp\+\_\+s7c.\+cpp.
+
+\mbox{\Hypertarget{classotp__s7c_ae97c0aad52d688f1aff95fa6c7d7d743}\label{classotp__s7c_ae97c0aad52d688f1aff95fa6c7d7d743}} 
+\index{otp\+\_\+s7c@{otp\+\_\+s7c}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!otp\+\_\+s7c@{otp\+\_\+s7c}}
+\subsubsection{\texorpdfstring{decrypt()}{decrypt()}}
+{\footnotesize\ttfamily int otp\+\_\+s7c\+::decrypt (\begin{DoxyParamCaption}\item[{std\+::string}]{Filename,  }\item[{std\+::string}]{key,  }\item[{std\+::string}]{output,  }\item[{size\+\_\+t}]{buf\+\_\+size,  }\item[{unsigned int}]{time }\end{DoxyParamCaption})}
+
+Function with the ops to decrypt a file.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em Filename} & Path to the crypted file. \\
+\hline
+\mbox{\tt in}  & {\em key} & Path to the key file. \\
+\hline
+\mbox{\tt in}  & {\em output} & Path to the folder to output (if == \char`\"{}\char`\"{} then use the Filename path). \\
+\hline
+\mbox{\tt in}  & {\em buf\+\_\+size} & Size of the buffers. \\
+\hline
+\mbox{\tt in}  & {\em time} & Time (in seconds) to refresh the percentage. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success or negative if fail. 
+\end{DoxyReturn}
+
+
+Definition at line 227 of file otp\+\_\+s7c.\+cpp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+7\+Guard\+\_\+\+C\+L\+I\+\_\+v1free/\mbox{\hyperlink{otp__s7c_8h}{otp\+\_\+s7c.\+h}}\item 
+7\+Guard\+\_\+\+C\+L\+I\+\_\+v1free/\mbox{\hyperlink{otp__s7c_8cpp}{otp\+\_\+s7c.\+cpp}}\end{DoxyCompactItemize}

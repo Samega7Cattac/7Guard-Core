@@ -173,12 +173,12 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 								for (unsigned long long i = 0; i < read; ++i)
 								{
 									_rdrand16_step(&val);
-									char rnd = val % 255 + 1;
+									unsigned char rnd = val % 255 + 1;
 									buf[i] += rnd;
 									num[i] = rnd;
 								}
-								fwrite(num, sizeof(char), read, crypt_file);
-								fwrite(buf, sizeof(char), read, key_file);
+								fwrite(buf, sizeof(char), read, crypt_file);
+								fwrite(num, sizeof(char), read, key_file);
 								readed += read;
 							}
 							memset(num, 0, buf_size);
@@ -258,17 +258,17 @@ int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, siz
 						std::cout << "[INFO] Buffers size set to \"max\"" << std::endl;
 						buf_size = alloc(&buf, &num, size, true);
 					}
-					else buf_size = alloc(&buf, &num, buf_size, false);
+					else buf_size = alloc(&buf, &num, (buf_size > size ? size : buf_size), false);
 					if (buf_size)
 					{
 						size_t readed = 0;
 						std::thread feedback_t(feedback, &size, &readed, true, time);
 						while (!feof(filename_crypt) || !feof(filename_key))
 						{
-							size_t read_k = fread(num, sizeof(char), buf_size, filename_crypt);
-							size_t read_c = fread(buf, sizeof(char), buf_size, filename_key);
+							size_t read_c = fread(buf, sizeof(char), buf_size, filename_crypt);
+							size_t read_k = fread(num, sizeof(char), buf_size, filename_key);
 							readed += read_c;
-							for (size_t i = 0; i < read_c; i++) buf[i] -= num[i];
+							for (size_t i = 0; i < read_c; ++i) buf[i] -= num[i];
 							fwrite(buf, sizeof(char), read_c, filename);
 						}
 						memset(num, 0, buf_size);
@@ -315,7 +315,7 @@ int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, siz
 
 void otp_s7c::calc(block * rc, block * cw, block * ck, unsigned int * rc_n, unsigned int * cw_n, unsigned int * ck_n, bool * read_done, bool * calc_done)
 {
-	while (!*read_done)
+	while (!*read_done || *rc_n > 0)
 	{
 		while (*rc_n > 0)
 		{
@@ -323,10 +323,11 @@ void otp_s7c::calc(block * rc, block * cw, block * ck, unsigned int * rc_n, unsi
 			ck->c = (unsigned char *)malloc(sizeof(char) * rc->size);
 			for (unsigned int i = 0; i < rc->size; ++i)
 			{
-				unsigned short rnd = 0;
-				_rdrand16_step(&rnd);
-				cw->c[i] = rc->c[i] + (char)rnd;
-				ck->c[i] = (char)rnd;
+				unsigned short val = 0;
+				_rdrand16_step(&val);
+				unsigned char rnd = val % 255 + 1;
+				cw->c[i] = rc->c[i] + rnd;
+				ck->c[i] = rnd;
 			}
 			cw->size = rc->size;
 			ck->size = rc->size;
@@ -350,7 +351,7 @@ void otp_s7c::calc(block * rc, block * cw, block * ck, unsigned int * rc_n, unsi
 void otp_s7c::write(block * cw, unsigned int * cw_n, bool * calc_done, FILE * d, size_t * writed)
 {
 	block * cw_w = cw;
-	while (!*calc_done)
+	while (!*calc_done || *cw_n > 0)
 	{
 		while (*cw_n > 0)
 		{

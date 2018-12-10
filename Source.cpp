@@ -108,11 +108,11 @@ int main(int argc, char * argv[])
 					}
 				}
 			}
-			else if ((std::string)argv[i] == "-t")
+			else if ((std::string)argv[i] == "-i")
 			{
 				if (t)
 				{
-					std::cout << "[ERROR] Multiple \"-t\" args!" << std::endl;
+					std::cout << "[ERROR] Multiple \"-i\" args!" << std::endl;
 					return -9;
 				}
 				else
@@ -120,7 +120,7 @@ int main(int argc, char * argv[])
 					if (!(argc < i + 1)) t = ++i;
 					else
 					{
-						std::cout << "[ERROR] Missing \"-t\" value!" << std::endl;
+						std::cout << "[ERROR] Missing \"-i\" value!" << std::endl;
 						return -9;
 					}
 				}
@@ -243,7 +243,8 @@ void help(char * call)
 	std::cout << '\n' << "Optional:" << '\n';
 	std::cout << '\t' << "-o - Path to output folder" << '\n';
 	std::cout << '\t' << "-t - refresh time in seconds" << '\n';
-	std::cout << '\t' << "--buf - specify the size used each of the 2 buffers (O = max)" << '\n';
+	std::cout << '\t' << "-i - percentage refresh time in sec" << '\n';
+	std::cout << '\t' << "--buf - specify the size used for each buffer (O = max)" << '\n';
 	std::cout << '\t' << "--threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)" << '\n';
 	std::cout << '\t' << '\t' << "(Only high-end CPUs recomendaded)" << std::endl;
 }
