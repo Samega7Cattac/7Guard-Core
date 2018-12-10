@@ -1,0 +1,155 @@
+\hypertarget{_source_8cpp}{}\section{7\+Guard\+\_\+\+C\+L\+I\+\_\+v1free/\+Source.cpp File Reference}
+\label{_source_8cpp}\index{7\+Guard\+\_\+\+C\+L\+I\+\_\+v1free/\+Source.\+cpp@{7\+Guard\+\_\+\+C\+L\+I\+\_\+v1free/\+Source.\+cpp}}
+{\ttfamily \#include \char`\"{}otp\+\_\+s7c.\+h\char`\"{}}\newline
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_source_8cpp_a6b20d41d6252e9871430c242cb1a56e7}{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}}~99999
+\item 
+\#define \mbox{\hyperlink{_source_8cpp_a2608b9496c2fae19afe620cc801c1967}{N\+\_\+\+B\+U\+F\+F\+ER}}~10240
+\item 
+\#define \mbox{\hyperlink{_source_8cpp_abf940742e1b38f8100a344f9275d4086}{B\+U\+F\+\_\+\+M\+AX}}~4294967295
+\item 
+\#define \mbox{\hyperlink{_source_8cpp_a0540485394df82add6b7c4f2137c7f21}{T\+I\+M\+E\+\_\+\+M\+AX}}~59
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{_source_8cpp_a433ece6d3063e861c6ecb1e47dcc98e7}{checks}} (long buf, long threads, long time)
+\item 
+void \mbox{\hyperlink{_source_8cpp_a3e4f88393fb17dcd55ae12c3c4220782}{help}} (char $\ast$call)
+\item 
+void \mbox{\hyperlink{_source_8cpp_a6c6e77fbfef9297a8c45199e994ec35c}{cred}} ()
+\item 
+int \mbox{\hyperlink{_source_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Purpose\+: File with the main functions
+
+\begin{DoxyAuthor}{Author}
+Samega 7\+Cattac
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+1.\+2
+\end{DoxyVersion}
+7\+Guard Copyright (C) 2018 Samega 7\+Cattac // see more\+: L\+I\+C\+E\+N\+SE 
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{_source_8cpp_abf940742e1b38f8100a344f9275d4086}\label{_source_8cpp_abf940742e1b38f8100a344f9275d4086}} 
+\index{Source.\+cpp@{Source.\+cpp}!B\+U\+F\+\_\+\+M\+AX@{B\+U\+F\+\_\+\+M\+AX}}
+\index{B\+U\+F\+\_\+\+M\+AX@{B\+U\+F\+\_\+\+M\+AX}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{B\+U\+F\+\_\+\+M\+AX}{BUF\_MAX}}
+{\footnotesize\ttfamily \#define B\+U\+F\+\_\+\+M\+AX~4294967295}
+
+
+
+Definition at line 13 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a6b20d41d6252e9871430c242cb1a56e7}\label{_source_8cpp_a6b20d41d6252e9871430c242cb1a56e7}} 
+\index{Source.\+cpp@{Source.\+cpp}!B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}}
+\index{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE@{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE}{BUFFER\_SIZE}}
+{\footnotesize\ttfamily \#define B\+U\+F\+F\+E\+R\+\_\+\+S\+I\+ZE~99999}
+
+
+
+Definition at line 11 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a2608b9496c2fae19afe620cc801c1967}\label{_source_8cpp_a2608b9496c2fae19afe620cc801c1967}} 
+\index{Source.\+cpp@{Source.\+cpp}!N\+\_\+\+B\+U\+F\+F\+ER@{N\+\_\+\+B\+U\+F\+F\+ER}}
+\index{N\+\_\+\+B\+U\+F\+F\+ER@{N\+\_\+\+B\+U\+F\+F\+ER}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{N\+\_\+\+B\+U\+F\+F\+ER}{N\_BUFFER}}
+{\footnotesize\ttfamily \#define N\+\_\+\+B\+U\+F\+F\+ER~10240}
+
+
+
+Definition at line 12 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a0540485394df82add6b7c4f2137c7f21}\label{_source_8cpp_a0540485394df82add6b7c4f2137c7f21}} 
+\index{Source.\+cpp@{Source.\+cpp}!T\+I\+M\+E\+\_\+\+M\+AX@{T\+I\+M\+E\+\_\+\+M\+AX}}
+\index{T\+I\+M\+E\+\_\+\+M\+AX@{T\+I\+M\+E\+\_\+\+M\+AX}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{T\+I\+M\+E\+\_\+\+M\+AX}{TIME\_MAX}}
+{\footnotesize\ttfamily \#define T\+I\+M\+E\+\_\+\+M\+AX~59}
+
+
+
+Definition at line 14 of file Source.\+cpp.
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{_source_8cpp_a433ece6d3063e861c6ecb1e47dcc98e7}\label{_source_8cpp_a433ece6d3063e861c6ecb1e47dcc98e7}} 
+\index{Source.\+cpp@{Source.\+cpp}!checks@{checks}}
+\index{checks@{checks}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{checks()}{checks()}}
+{\footnotesize\ttfamily bool checks (\begin{DoxyParamCaption}\item[{long}]{buf,  }\item[{long}]{threads,  }\item[{long}]{time }\end{DoxyParamCaption})}
+
+Check the range of the numeric inputs.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em buf} & Counts the number of inputs. \\
+\hline
+\mbox{\tt in}  & {\em threads} & Inputs from the user. \\
+\hline
+\mbox{\tt in}  & {\em time} & Inputs from the user. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success or negative if fail. 
+\end{DoxyReturn}
+
+
+Definition at line 209 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a6c6e77fbfef9297a8c45199e994ec35c}\label{_source_8cpp_a6c6e77fbfef9297a8c45199e994ec35c}} 
+\index{Source.\+cpp@{Source.\+cpp}!cred@{cred}}
+\index{cred@{cred}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{cred()}{cred()}}
+{\footnotesize\ttfamily void cred (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Display the credits message. 
+
+Definition at line 255 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a3e4f88393fb17dcd55ae12c3c4220782}\label{_source_8cpp_a3e4f88393fb17dcd55ae12c3c4220782}} 
+\index{Source.\+cpp@{Source.\+cpp}!help@{help}}
+\index{help@{help}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily void help (\begin{DoxyParamCaption}\item[{char $\ast$}]{call }\end{DoxyParamCaption})}
+
+Display the help message.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em call} & Name witch this software was called. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 234 of file Source.\+cpp.
+
+\mbox{\Hypertarget{_source_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\label{_source_8cpp_a0ddf1224851353fc92bfbff6f499fa97}} 
+\index{Source.\+cpp@{Source.\+cpp}!main@{main}}
+\index{main@{main}!Source.\+cpp@{Source.\+cpp}}
+\subsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+Handle the inputs and pass that to the correct function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em argc} & Counts the number of inputs. \\
+\hline
+\mbox{\tt in}  & {\em argv} & Inputs from the user. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success or negative if fail. 
+\end{DoxyReturn}
+
+
+Definition at line 28 of file Source.\+cpp.
+
