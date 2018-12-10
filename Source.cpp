@@ -242,7 +242,6 @@ void help(char * call)
 	std::cout << '\t' << call << " [ -crypt <file_to_crypt.*> | -decrypt <file_to_decrypt.7cy> -key <file_with_key.7ky>]" << '\n';
 	std::cout << '\n' << "Optional:" << '\n';
 	std::cout << '\t' << "-o - Path to output folder" << '\n';
-	std::cout << '\t' << "-t - refresh time in seconds" << '\n';
 	std::cout << '\t' << "-i - percentage refresh time in sec" << '\n';
 	std::cout << '\t' << "--buf - specify the size used for each buffer (O = max)" << '\n';
 	std::cout << '\t' << "--threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)" << '\n';
