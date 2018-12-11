@@ -13,7 +13,7 @@ Extract the `.tar.gz` file somewhere and open a terminal to compile the code:
 
 ```
 mkdir build
-g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd
+g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd -pthread
 ```
 
 ## How it work
