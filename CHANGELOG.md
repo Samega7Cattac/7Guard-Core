@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v2.0] - Unreleased
+### Added
+- Makefile config file
+- Doxygen config file
+
+### Fixed
+- Not outputing bug fixed
+- Copyrights fixed
+- Discord tag updated
+
+### Changed
+- arguments convertition updated
+- Errors go to stderr buffer
+- Documentation updated
+
 ## [v1.2] - 2018-12-11
 ### Added
 - Documentation added.

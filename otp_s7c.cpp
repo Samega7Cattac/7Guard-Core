@@ -4,11 +4,23 @@
  *
  * @author Samega 7Cattac
  *
- * @version 1.2
+ * @version v2.0
  *
- * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
+ * 7Guard Copyright (C) 2019 Samega 7Cattac // see more: LICENSE
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "otp_s7c.h"
+#include "otp_s7c.hpp"
 
 int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, size_t size, bool max)
 {
@@ -57,13 +69,15 @@ int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, size_t size, bool
 	}
 }
 
-void otp_s7c::feedback(size_t * size, size_t * readed, bool decrypt, unsigned int time)
+void otp_s7c::feedback(long int * size, size_t * readed, bool decrypt, unsigned int time)
 {
+	
 	float p = 0;
 	while (*readed < *size || p < 100)
 	{
 		p = *readed * (float)100.00 / *size;
 		std::cout << "\r" << "[INFO] Start" << (decrypt ? " de" : " ") << "crypting... (" << std::fixed << std::setprecision(2) << p << "%)";
+		fflush(stdout);
 		if (time != 0 && p < 100) std::this_thread::sleep_for(std::chrono::seconds(time));
 	}
 	std::cout << std::endl;
@@ -81,7 +95,7 @@ std::string otp_s7c::GetFileName(std::string path)
 	return filename;
 }
 
-int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, unsigned int threads, unsigned int time)
+int otp_s7c::crypt(std::string Filename, std::string output)
 {
 	int error = 0;
 	FILE * file = fopen(Filename.c_str(), "rb");
@@ -113,9 +127,9 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 				if (_rdrand16_step(&val))
 				{
 					fseek(file, 0L, SEEK_END);
-					size_t size = ftell(file);
+					long int size = ftell(file);
 					rewind(file);
-					if (threads)
+					if (otp_s7c::use_threads)
 					{
 						std::cout << "[WARNING] This is a experimental option (may cause loss of data)!" << std::endl;
 						block * rc = (block *)malloc(sizeof(block));
@@ -131,13 +145,13 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 						std::thread calc_t(otp_s7c::calc, rc, cw, ck, &rc_n, &cw_n, &ck_n, &read_done, &calc_done);
 						std::thread write_t(otp_s7c::write, cw, &cw_n, &calc_done, crypt_file, &writed);
 						std::thread writeK_t(otp_s7c::write, ck, &ck_n, &calc_done, key_file, &writedk);
-						char * line = (char *)malloc(sizeof(char) * buf_size);
-						std::thread feedback_t(feedback, &size, &writed, false, time);
+						char * line = (char *)malloc(sizeof(char) * otp_s7c::buffer_size);
+						std::thread feedback_t(feedback, &size, &writed, false, otp_s7c::percentage_interval);
 						while (!feof(file))
 						{
-							if (rc_n < threads)
+							if (rc_n < queue_size)
 							{
-								rc->size = fread(line, sizeof(char), buf_size, file);
+								rc->size = fread(line, sizeof(char), otp_s7c::buffer_size, file);
 								rc->c = (unsigned char *)malloc(sizeof(char) * rc->size);
 								memcpy(rc->c, line, rc->size);
 								rc->next = (block *)malloc(sizeof(block));
@@ -157,19 +171,19 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 					{
 						unsigned char * buf = nullptr;
 						unsigned char * num = nullptr;
-						if (!buf_size)
+						if (!otp_s7c::buffer_size)
 						{
 							std::cout << "[INFO] Buffers size set to \"auto\"\n";
-							buf_size = otp_s7c::alloc(&buf, &num, size, true);
+							otp_s7c::buffer_size = otp_s7c::alloc(&buf, &num, size, true);
 						}
-						else buf_size = otp_s7c::alloc(&buf, &num, (buf_size > size ? size : buf_size), false);
-						if (buf_size)
+						else otp_s7c::buffer_size = otp_s7c::alloc(&buf, &num, (otp_s7c::buffer_size > size ? size : otp_s7c::buffer_size), false);
+						if (otp_s7c::buffer_size)
 						{
 							size_t readed = 0;
-							std::thread feedback_t(feedback, &size, &readed, false, time);
+							std::thread feedback_t(feedback, &size, &readed, false, otp_s7c::percentage_interval);
 							while (!feof(file))
 							{
-								size_t read = fread(buf, sizeof(char), buf_size, file);
+								size_t read = fread(buf, sizeof(char), otp_s7c::buffer_size, file);
 								for (unsigned long long i = 0; i < read; ++i)
 								{
 									_rdrand16_step(&val);
@@ -181,8 +195,8 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 								fwrite(num, sizeof(char), read, key_file);
 								readed += read;
 							}
-							memset(num, 0, buf_size);
-							memset(buf, 0, buf_size);
+							memset(num, 0, otp_s7c::buffer_size);
+							memset(buf, 0, otp_s7c::buffer_size);
 							free(buf);
 							free(num);
 							feedback_t.join();
@@ -190,14 +204,14 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 						}
 						else
 						{
-							std::cout << "[ERROR] Cannot allocate buffers" << std::endl;
+							std::cerr << "[ERROR] Cannot allocate buffers" << std::endl;
 							error = -5;
 						}
 					}
 				}
 				else
 				{
-					std::cout << "[ERROR] Error generating hardware random value" << std::endl;
+					std::cerr << "[ERROR] Error generating hardware random value" << std::endl;
 					error = -4;
 				}
 				fclose(key_file);
@@ -224,10 +238,10 @@ int otp_s7c::crypt(std::string Filename, std::string output, size_t buf_size, un
 	return error;
 }
 
-int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, size_t buf_size, unsigned int time)
+int otp_s7c::decrypt(std::string Filename, std::string key, std::string output)
 {
 	int error = 0;
-	FILE * filename_crypt = fopen(crypt.c_str(), "rb");
+	FILE * filename_crypt = fopen(Filename.c_str(), "rb");
 	if (filename_crypt)
 	{
 		FILE * filename_key = fopen(key.c_str(), "rb");
@@ -237,15 +251,15 @@ int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, siz
 			{
 				if (output.find_last_of("\"") == (output.length() - 1)) output = output.substr(0, output.length() - 1);
 				if (output.find_last_of("\\") != std::string::npos) output.append("\\");
-				output.append(otp_s7c::GetFileName(crypt));
+				output.append(otp_s7c::GetFileName(Filename));
 			}
-			else output = crypt;
-			output.erase(crypt.find_last_of(".7cy") - 3, 5);
+			else output = Filename;
+			output.erase(Filename.find_last_of(".7cy") - 3, 5);
 			FILE * filename = fopen(output.c_str(), "wb");
 			if (filename)
 			{
 				fseek(filename_key, 0L, SEEK_END);
-				size_t size = ftell(filename_key);
+				long int size = ftell(filename_key);
 				fseek(filename_crypt, 0L, SEEK_END);
 				if (size == ftell(filename_crypt))
 				{
@@ -253,26 +267,26 @@ int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, siz
 					rewind(filename_crypt);
 					unsigned char * buf = nullptr;
 					unsigned char * num = nullptr;
-					if (!buf_size)
+					if (!otp_s7c::buffer_size)
 					{
 						std::cout << "[INFO] Buffers size set to \"max\"" << std::endl;
-						buf_size = alloc(&buf, &num, size, true);
+						otp_s7c::buffer_size = alloc(&buf, &num, size, true);
 					}
-					else buf_size = alloc(&buf, &num, (buf_size > size ? size : buf_size), false);
-					if (buf_size)
+					else otp_s7c::buffer_size = alloc(&buf, &num, (otp_s7c::buffer_size > size ? size : otp_s7c::buffer_size), false);
+					if (otp_s7c::buffer_size)
 					{
 						size_t readed = 0;
-						std::thread feedback_t(feedback, &size, &readed, true, time);
+						std::thread feedback_t(feedback, &size, &readed, true, otp_s7c::percentage_interval);
 						while (!feof(filename_crypt) || !feof(filename_key))
 						{
-							size_t read_c = fread(buf, sizeof(char), buf_size, filename_crypt);
-							size_t read_k = fread(num, sizeof(char), buf_size, filename_key);
+							size_t read_c = fread(buf, sizeof(char), otp_s7c::buffer_size, filename_crypt);
+							/*size_t read_k = */fread(num, sizeof(char), otp_s7c::buffer_size, filename_key);
 							readed += read_c;
 							for (size_t i = 0; i < read_c; ++i) buf[i] -= num[i];
 							fwrite(buf, sizeof(char), read_c, filename);
 						}
-						memset(num, 0, buf_size);
-						memset(buf, 0, buf_size);
+						memset(num, 0, otp_s7c::buffer_size);
+						memset(buf, 0, otp_s7c::buffer_size);
 						free(buf);
 						free(num);
 						feedback_t.join();
@@ -280,13 +294,13 @@ int otp_s7c::decrypt(std::string crypt, std::string key, std::string output, siz
 					}
 					else
 					{
-						std::cout << "[ERROR] Cannot allocate buffers" << std::endl;
+						std::cerr << "[ERROR] Cannot allocate buffers" << std::endl;
 						error = -5;
 					}
 				}
 				else
 				{
-					std::cout << "[ERROR] Crypt-Key pair don't match!" << std::endl;
+					std::cerr << "[ERROR] Crypt-Key pair don't match!" << std::endl;
 					error = -6;
 				}
 				fclose(filename);

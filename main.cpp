@@ -1,20 +1,28 @@
 /**
- * @file Source.cpp
+ * @file main.cpp
  * Purpose: File with the main functions
  *
  * @author Samega 7Cattac
  *
- * @version 1.2
+ * @version v2.0
  *
- * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
+ * 7Guard Copyright (C) 2018 Samega 7Cattac
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#define BUFFER_SIZE 99999 // Default size of the buffers
-#define N_BUFFER 10240
-#define BUF_MAX 4294967295
-#define TIME_MAX 59
-#include "otp_s7c.h"
+#include "otp_s7c.hpp"
+#include <charconv>
 
-bool checks(long buf, long threads, long time);
 void help(char * call);
 void cred();
 
@@ -27,24 +35,22 @@ void cred();
 */
 int main(int argc, char * argv[])
 {
-	std::cout << std::endl;
 	if (argc > 1)
 	{
 		unsigned int crypt = 0;
 		unsigned int decrypt = 0;
 		unsigned int key = 0;
 		unsigned int o = 0;
-		unsigned int t = 0;
-		unsigned int buf = 0;
-		unsigned int threads = 0;
+		std::from_chars_result t;
 		bool h = false;
-		for (int i = 1; i < argc; i++)
+		otp_s7c s7c;
+		for (int i = 1; i < argc; ++i)
 		{
 			if ((std::string)argv[i] == "-crypt")
 			{
 				if (crypt)
 				{
-					std::cout << "[ERROR] Multiple \"-crypt\" args!" << std::endl;
+					std::cerr << "[ERROR] Multiple \"-crypt\" args!" << std::endl;
 					return -9;
 				}
 				else
@@ -52,7 +58,7 @@ int main(int argc, char * argv[])
 					if (argc > i + 1) crypt = ++i;
 					else
 					{
-						std::cout << "[ERROR] Missing \"-crypt\" value!" << std::endl;
+						std::cerr << "[ERROR] Missing \"-crypt\" value!" << std::endl;
 						return -9;
 					}
 				}
@@ -61,7 +67,7 @@ int main(int argc, char * argv[])
 			{
 				if (decrypt)
 				{
-					std::cout << "[ERROR] Multiple \"-decrypt\" args!" << std::endl;
+					std::cerr << "[ERROR] Multiple \"-decrypt\" args!" << std::endl;
 					return -9;
 				}
 				else
@@ -69,7 +75,7 @@ int main(int argc, char * argv[])
 					if (argc > i + 1) decrypt = ++i;
 					else
 					{
-						std::cout << "[ERROR] Missing \"-decrypt\" value!" << std::endl;
+						std::cerr << "[ERROR] Missing \"-decrypt\" value!" << std::endl;
 						return -9;
 					}
 				}
@@ -78,7 +84,7 @@ int main(int argc, char * argv[])
 			{
 				if (key)
 				{
-					std::cout << "[ERROR] Multiple \"-key\" args!" << std::endl;
+					std::cerr << "[ERROR] Multiple \"-key\" args!" << std::endl;
 					return -9;
 				}
 				else
@@ -86,7 +92,7 @@ int main(int argc, char * argv[])
 					if (argc > i + 1) key = ++i;
 					else
 					{
-						std::cout << "[ERROR] Missing \"-key\" value!" << std::endl;
+						std::cerr << "[ERROR] Missing \"-key\" value!" << std::endl;
 						return -9;
 					}
 				}
@@ -95,7 +101,7 @@ int main(int argc, char * argv[])
 			{
 				if (o)
 				{
-					std::cout << "[ERROR] Multiple \"-o\" args!" << std::endl;
+					std::cerr << "[ERROR] Multiple \"-o\" args!" << std::endl;
 					return -9;
 				}
 				else
@@ -103,127 +109,97 @@ int main(int argc, char * argv[])
 					if (argc > i + 1) o = ++i;
 					else
 					{
-						std::cout << "[ERROR] Missing \"-o\" value!" << std::endl;
+						std::cerr << "[ERROR] Missing \"-o\" value!" << std::endl;
 						return -9;
 					}
 				}
 			}
 			else if ((std::string)argv[i] == "-i")
 			{
-				if (t)
+				if (!(argc < i + 1))
 				{
-					std::cout << "[ERROR] Multiple \"-i\" args!" << std::endl;
-					return -9;
+					t = std::from_chars(argv[++i], argv[i] + strlen(argv[i]), s7c.percentage_interval, 10);
+					if(t.ec == std::errc::invalid_argument || t.ec == std::errc::result_out_of_range)
+					{
+						std::cerr << "[ERROR] Invalid \"-i\" value!" << std::endl;
+						return -9;
+					}
 				}
 				else
 				{
-					if (!(argc < i + 1)) t = ++i;
-					else
-					{
-						std::cout << "[ERROR] Missing \"-i\" value!" << std::endl;
-						return -9;
-					}
+					std::cerr << "[ERROR] Missing \"-i\" value!" << std::endl;
+					return -9;
 				}
 			}
 			else if ((std::string)argv[i] == "--buf")
 			{
-				if (buf)
+				if (!(argc < i + 1))
 				{
-					std::cout << "[ERROR] Multiple \"--buf\" args!" << std::endl;
-					return -9;
+					t = std::from_chars(argv[++i], argv[i] + strlen(argv[i]), s7c.buffer_size, 10);
+					if(t.ec == std::errc::invalid_argument || t.ec == std::errc::result_out_of_range)
+					{
+						std::cerr << "[ERROR] Invalid \"--buf\" value!" << std::endl;
+						return -9;
+					}
 				}
 				else
 				{
-					if (!(argc < i + 1)) buf = ++i;
-					else
-					{
-						std::cout << "[ERROR] Missing \"--buf\" value!" << std::endl;
-						return -9;
-					}
+					std::cerr << "[ERROR] Missing \"--buf\" value!" << std::endl;
+					return -9;
 				}
 			}
 			else if ((std::string)argv[i] == "--threads")
 			{
-				if (threads)
+				if (!(argc < i + 1))
 				{
-					std::cout << "[ERROR] Multiple \"--threads\" args!" << std::endl;
-					return -9;
+					t = std::from_chars(argv[++i], argv[i] + strlen(argv[i]), s7c.queue_size, 10);
+					s7c.use_threads = true;
+					if(t.ec == std::errc::invalid_argument || t.ec == std::errc::result_out_of_range)
+					{
+						std::cerr << "[ERROR] Invalid \"--threads\" value!" << std::endl;
+						return -9;
+					}
 				}
 				else
 				{
-					if (!(argc < i + 1)) threads = ++i;
-					else
-					{
-						std::cout << "[ERROR] Missing \"--threads\" value!" << std::endl;
-						return -9;
-					}
+					std::cerr << "[ERROR] Missing \"--threads\" value!" << std::endl;
+					return -9;
 				}
 			}
 			else if ((std::string)argv[i] == "-h") h = true;
 			else
 			{
-				std::cout << "[ERROR] Invalid option \"" << argv[i] << "\"!" << std::endl;
+				std::cerr << "[ERROR] Invalid option \"" << argv[i] << "\"!" << std::endl;
 				std::cout << "use option \"-h\" for help" << std::endl;
 				return -9;
 			}
 		}
-		otp_s7c s7c;
-		if ((crypt && decrypt) || (crypt || decrypt) && h)
+		if (((crypt && decrypt) || (crypt || decrypt)) && h)
 		{
-			std::cout << "[ERROR] Select only 1 mode (crypt | decrypt | help)!" << std::endl;
+			std::cerr << "[ERROR] Select only 1 mode (crypt | decrypt | help)!" << std::endl;
 			return -9;
 		}
 		else if (h) help(argv[0]);
 		else if (crypt)
 		{
-			if (key) std::cout << "[WARNING] \"-key\" option will be ignored" << std::endl;
+			if (key) std::cerr << "[WARNING] \"-key\" option will be ignored" << std::endl;
 			std::cout << "[INFO] Initializing..." << std::endl;
-			if (checks(atoi(argv[buf]), (!threads ? 0 : atoi(argv[threads])), atoi(argv[t]))) return -9;
-			return s7c.crypt(argv[crypt], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!threads ? 0 : ((std::string)argv[threads] == "0" ? N_BUFFER : strtoul(argv[threads], NULL, 10))), (!t ? 1 : atoi(argv[t])));
+			return s7c.crypt(argv[crypt], (o ? argv[o] : ""));
 		}
 		else if (decrypt)
 		{
 			if (!key)
 			{
-				std::cout << "[ERROR] Missing \"-key\" option!" << std::endl;
+				std::cerr << "[ERROR] Missing \"-key\" option!" << std::endl;
 				return -9;
 			}
-			else if (threads) std::cout << "[WARNING] \"--threads\" option will be ignored" << std::endl;
+			else if (s7c.use_threads) std::cerr << "[WARNING] \"--threads\" option will be ignored" << std::endl;
 			std::cout << "[INFO] Initializing..." << std::endl;
-			if (checks(atoi(argv[buf]), atoi(argv[threads]), atoi(argv[t]))) return -9;
-			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""), (!buf ? BUFFER_SIZE : strtoull(argv[buf], NULL, 10)), (!t ? 1 : atoi(argv[t])));
+			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""));
 		}
 	}
 	else cred();
 	return 0;
-}
-
-/**
-	Check the range of the numeric inputs.
-
-	@param[in] buf Counts the number of inputs.
-	@param[in] threads Inputs from the user.
-	@param[in] time Inputs from the user.
-	@return 0 if success or negative if fail.
-*/
-bool checks(long buf, long threads, long time)
-{
-	if (buf < 0 || buf > BUF_MAX)
-	{
-		std::cout << "[ERROR] Invalid buf size! [0 - " << BUF_MAX << "]" << std::endl;
-		return true;
-	}
-	else if (threads < 0 || threads > BUF_MAX)
-	{
-		std::cout << "[ERROR] Invalid threads number! [0 - " << BUF_MAX << "]" << std::endl;
-		return true;
-	}
-	else if (time < 0 || time > TIME_MAX)
-	{
-		std::cout << "[ERROR] Invalid refresh time! [0 - " << TIME_MAX << "]" << std::endl;
-		return true;
-	}
-	return false;
 }
 
 /**
@@ -264,5 +240,8 @@ void cred()
 	std::cout << '\n' << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << '\n';
 	std::cout << "Discord: Samega 7Cattac#5966" << '\n';
 	std::cout << '\n' << "use option \"-h\" for help" << '\n';
-	std::cout << '\n' << "7Guard Copyright (C) 2018 Samega 7Cattac" << std::endl;
+	std::cout << "\n\t" << "7Guard Copyright (C) 2019 Samega 7Cattac" << std::endl;
+    std::cout << "This program comes with ABSOLUTELY NO WARRANTY" << std::endl;
+    std::cout << "This is free software, and you are welcome to redistribute it" << std::endl;
+    std::cout << "under certain conditions" << std::endl;
 }

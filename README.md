@@ -3,20 +3,20 @@
 
 ## Getting Started
 
-For Windows you can download the pre-compiled executable.
+## Requirements
+- git
+- make
+- Doxygen (optional, only if you want to generate the docs)
 
-You also can compile it using `Developer Command Prompt for VS 2017` explained [here](https://docs.microsoft.com/pt-pt/cpp/build/walkthrough-compiling-a-native-cpp-program-on-the-command-line?view=vs-2017#open-a-developer-command-prompt) or creating a `c++ empty project` on Visual Studio and adding the files to it.
-
-
-For linux you need to download the source code and have `g++` installed.
-Extract the `.tar.gz` file somewhere and open a terminal to compile the code:
+## Build
 
 ```
-mkdir build
-g++ Source.cpp otp_s7c.cpp -o build/7Guard -mrdrnd -pthread
+git clone https://github.com/Samega7Cattac/7Guard-Core.git
+make
 ```
+And you should have `7Guard` inside `./build` folder.
 
-## How it work
+## How it works
 
 7Guard use a encryption tecnique called [OTP](https://en.wikipedia.org/wiki/One-time_pad) (One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number used to the key file.
 
@@ -58,6 +58,14 @@ Optional:
                 (Only high-end CPUs recomendaded)
 ```
 
+`make` options:
+```
+make        - build targeted for release
+make debug  - build targeted for debug
+make docs   - generate docs using Doxygen
+make clean  - cleans the current build
+```
+
 ## Versioning
 
 For the versions available, see the [releases on this repository](https://github.com/Samega7Cattac/7Guard-Core/releases). 
@@ -73,4 +81,4 @@ See also the list of [contributors](https://github.com/Samega7Cattac/7Guard-Core
 This project is licensed under the GNU General Public License v3.0 License - see the [LICENSE](LICENSE) file for details
 
 
-7Guard Copyright (C) 2018 Samega 7Cattac
+7Guard Copyright (C) 2019 Samega 7Cattac

@@ -1,13 +1,28 @@
 /**
- * @file otp_s7c.h
+ * @file otp_s7c.hpp
  * Purpose: Header file of otp_s7c.cpp
  *
  * @author Samega 7Cattac
  *
- * @version 1.2
+ * @version v2.0
  *
- * 7Guard Copyright (C) 2018 Samega 7Cattac // see more: LICENSE
+ * 7Guard Copyright (C) 2019 Samega 7Cattac // see more: LICENSE
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef OTP_S7C_H
+#define OTP_S7C_H
+
 #if defined(_M_AMD64) && defined(_WIN32)
 #define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
 #elif __linux__
@@ -22,17 +37,32 @@
 class otp_s7c
 {
 public:
+
+    /**
+        If want to use threads method
+    */
+	bool use_threads = false;
+    /**
+        Size of the buffers per block (Default: 99999)
+    */
+	size_t buffer_size = 99999;
+    /**
+        Number max of blocks (Default: 10240)
+    */
+	unsigned int queue_size = 10240;
+    /**
+        Refresh time of the percentage in seconds (Default: 1)
+    */
+	unsigned int percentage_interval = 1;
+
 	/**
 		Function with the ops to crypt a file.
 
 		@param[in] Filename Path to the file to crypt.
 		@param[in] output Path to the folder to output (if == "" then use the Filename path).
-		@param[in] buf_size Size of the buffers.
-		@param[in] threads Number max of block in queue.
-		@param[in] time Time (in seconds) to refresh the percentage.
 		@return 0 if success or negative if fail.
 	*/
-	int crypt(std::string Filename, std::string output, size_t buf_size, unsigned int threads, unsigned int time);
+	int crypt(std::string Filename, std::string output);
 
 	/**
 		Function with the ops to decrypt a file.
@@ -40,11 +70,9 @@ public:
 		@param[in] Filename Path to the crypted file.
 		@param[in] key Path to the key file.
 		@param[in] output Path to the folder to output (if == "" then use the Filename path).
-		@param[in] buf_size Size of the buffers.
-		@param[in] time Time (in seconds) to refresh the percentage.
 		@return 0 if success or negative if fail.
 	*/
-	int decrypt(std::string Filename, std::string key, std::string output, size_t buf_size, unsigned int time);
+	int decrypt(std::string Filename, std::string key, std::string output);
 
 private:
 
@@ -100,7 +128,7 @@ private:
 		@param[in] decrypt If true then use word "decrypt" instead of "crypt".
 		@param[in] time Time (in seconds) to refresh the percentage.
 	*/
-	static void feedback(size_t * size, size_t * readed, bool decrypt, unsigned int time);
+	static void feedback(long int * size, size_t * readed, bool decrypt, unsigned int time);
 
 	/**
 		Function to get the filename from a path.
@@ -110,3 +138,4 @@ private:
 	*/
 	std::string GetFileName(std::string path);
 };
+#endif

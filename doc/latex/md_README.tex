@@ -1,0 +1,75 @@
+7Guard -\/ O\+TP encryption software\hypertarget{md_README_autotoc_md17}{}\doxysection{Getting Started}\label{md_README_autotoc_md17}
+\hypertarget{md_README_autotoc_md18}{}\doxysection{Requirements}\label{md_README_autotoc_md18}
+
+\begin{DoxyItemize}
+\item git
+\item make
+\item Doxygen (optional, only if you want to generate the docs)
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md19}{}\doxysection{Build}\label{md_README_autotoc_md19}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone https://github.com/Samega7Cattac/7Guard-\/Core.git}
+\DoxyCodeLine{make}
+\end{DoxyCode}
+ And you should have {\ttfamily 7Guard} inside {\ttfamily ./build} folder.\hypertarget{md_README_autotoc_md20}{}\doxysection{How it works}\label{md_README_autotoc_md20}
+7Guard use a encryption tecnique called \href{https://en.wikipedia.org/wiki/One-time_pad}{\texttt{ O\+TP}} (One-\/\+Time-\/\+Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number used to the key file.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{file\_to\_crypt + random\_number = crypted\_file}
+\DoxyCodeLine{                      |               |}
+\DoxyCodeLine{                      |                -\/-\/>Stored in crypted file (*.7cy)}
+\DoxyCodeLine{                       -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/>Stored in key file (*.7ky)}
+\end{DoxyCode}
+
+
+To decrypt it\textquotesingle{}s just inverting the sum.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{original\_file = crypted\_file -\/ random\_number}
+\end{DoxyCode}
+
+
+The problems with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.
+
+1) The problem was solved by using the Intel functions to generate random numbers in hardware level (more info \href{https://en.wikipedia.org/wiki/RdRand}{\texttt{ here}}).
+
+2) In this version you need to deal with it. I\textquotesingle{}m already working on a implemetation with a server (more for enterprise use) where the keys will be stored on the enterprise server.\hypertarget{md_README_autotoc_md21}{}\doxysection{Usage}\label{md_README_autotoc_md21}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Options:}
+\DoxyCodeLine{        -\/crypt -\/ path to the file to crypt}
+\DoxyCodeLine{        -\/decrypt -\/ path to the crypted file}
+\DoxyCodeLine{        -\/key -\/ path to the key file (only with "-\/decrypt")}
+\DoxyCodeLine{        -\/h -\/ display this help message}
+\DoxyCodeLine{Usage:}
+\DoxyCodeLine{        7Guard\_CLI\_v1b.exe [ -\/crypt <file\_to\_crypt.*> | -\/decrypt <file\_to\_decrypt.7cy> -\/key <file\_with\_key.7ky]}
+\DoxyCodeLine{}
+\DoxyCodeLine{Optional:}
+\DoxyCodeLine{        -\/o -\/ Path to output folder}
+\DoxyCodeLine{        -\/i -\/ percentage refresh time in sec}
+\DoxyCodeLine{        -\/-\/buf -\/ specify the size used each of the 2 buffers (O = max)}
+\DoxyCodeLine{        -\/-\/threads -\/ EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)}
+\DoxyCodeLine{                (Only high-\/end CPUs recomendaded)}
+\end{DoxyCode}
+
+
+{\ttfamily make} options\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make        -\/ build targeted for release}
+\DoxyCodeLine{make debug  -\/ build targeted for debug}
+\DoxyCodeLine{make docs   -\/ generate docs using Doxygen}
+\DoxyCodeLine{make clean  -\/ cleans the current build}
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md22}{}\doxysection{Versioning}\label{md_README_autotoc_md22}
+For the versions available, see the \href{https://github.com/Samega7Cattac/7Guard-Core/releases}{\texttt{ releases on this repository}}.\hypertarget{md_README_autotoc_md23}{}\doxysection{Authors}\label{md_README_autotoc_md23}
+
+\begin{DoxyItemize}
+\item {\bfseries{Samega 7Cattac}} -\/ {\itshape Initial work} -\/ \href{https://github.com/Samega7Cattac}{\texttt{ Samega 7Cattac}}
+\end{DoxyItemize}
+
+See also the list of \href{https://github.com/Samega7Cattac/7Guard-Core/graphs/contributors}{\texttt{ contributors}} who participated in this project.\hypertarget{md_README_autotoc_md24}{}\doxysection{License}\label{md_README_autotoc_md24}
+This project is licensed under the G\+NU General Public License v3.\+0 License -\/ see the \mbox{[}L\+I\+C\+E\+N\+SE\mbox{]}(L\+I\+C\+E\+N\+SE) file for details
+
+7Guard Copyright (C) 2019 Samega 7Cattac 
