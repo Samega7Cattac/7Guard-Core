@@ -12,6 +12,7 @@
 
 ```
 git clone https://github.com/Samega7Cattac/7Guard-Core.git
+cd 7Guard-Core
 make
 ```
 And you should have `7Guard` inside `./build` folder.
