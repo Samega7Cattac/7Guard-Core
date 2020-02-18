@@ -16,8 +16,7 @@ endif
 endif
 
 all: $(OBJS)
-	if [ ! -d "./build" ]; then mkdir build; fi
-	$(CXX) -o ./build/$(OUTPUT_FILE) $^ $(CXXFLAGS)
+	$(CXX) -o $(OUTPUT_FILE) $^ $(CXXFLAGS)
 
 %.o: %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)

@@ -26,19 +26,17 @@
 #if defined(_M_AMD64) && defined(_WIN32)
 #define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
 #elif __linux__
-#include <cstring> // memset() (Only for linux)
 #include <sys/mman.h>
 #include <sys/stat.h>
-//#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #endif
+#include <cstring>
 #include <immintrin.h> // _rdrand16_step()
 #include <iomanip> // std::setprecision()
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <semaphore.h>
 
 class otp_s7c
 {
