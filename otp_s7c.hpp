@@ -27,29 +27,22 @@
 #define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
 #elif __linux__
 #include <cstring> // memset() (Only for linux)
+#include <sys/mman.h>
+#include <sys/stat.h>
+//#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 #include <immintrin.h> // _rdrand16_step()
 #include <iomanip> // std::setprecision()
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <semaphore.h>
 
 class otp_s7c
 {
 public:
-
-    /**
-        If want to use threads method
-    */
-	bool use_threads = false;
-    /**
-        Size of the buffers per block (Default: 99999)
-    */
-	size_t buffer_size = 99999;
-    /**
-        Number max of blocks (Default: 10240)
-    */
-	unsigned int queue_size = 10240;
     /**
         Refresh time of the percentage in seconds (Default: 1)
     */
@@ -76,50 +69,6 @@ public:
 
 private:
 
-	// Block used to create a queue for threads processing
-	struct block
-	{
-		unsigned char * c = nullptr; // Pointer to the char array
-		unsigned int size = 0; // Size of the array
-		block * next = nullptr; // Pointer to the next block
-	};
-
-	/**
-		Thread that will handle the calculations.
-
-		@param[in, out] rc Pointer to the block list Read-Calc.
-		@param[in, out] cw Pointer to the block list Calc-Write.
-		@param[in, out] ck Pointer to the block list Calc-WriteK.
-		@param[in, out] rc_n Pointer to the number of blocks in queue Read-Calc.
-		@param[in, out] cw_n Pointer to the number of blocks in queue Calc-Write.
-		@param[in, out] ck_n Pointer to the number of blocks in queue Calc-WriteK.
-		@param[in] read_done If the Read process is completed.
-		@param[in, out] calc_done If the Calc process is completed.
-	*/
-	static void calc(block * rc, block * cw, block * ck, unsigned int * rc_n, unsigned int * cw_n, unsigned int * ck_n, bool * read_done, bool * calc_done);
-
-	/**
-		Thread that will handle the write process.
-
-		@param[in, out] cw Pointer to the block list Calc-Write.
-		@param[in, out] cw_n Pointer to the number of blocks in queue Calc-Write.
-		@param[in] calc_done If the Calc process is completed.
-		@param[in, out] d Pointer to the output file.
-		@param[in, out] writed Pointer to number of bytes already wrote.
-	*/
-	static void write(block * cw, unsigned int * cw_n, bool * calc_done, FILE * d, size_t * writed);
-
-	/**
-		Function to allocate memory to the buffers.
-
-		@param[in, out] Pointer to "buf" buffer.
-		@param[in, out] Pointer to "num" buffer.
-		@param[in] size Size of the buffer.
-		@param[in] max If true then is to allocate with max space possible.
-		@return Size of the buffer if success or 0 if fail.
-	*/
-	int alloc(unsigned char ** buf, unsigned char ** num, size_t size, bool max);
-
 	/**
 		Displays the percentage of the processed file.
 
@@ -128,8 +77,8 @@ private:
 		@param[in] decrypt If true then use word "decrypt" instead of "crypt".
 		@param[in] time Time (in seconds) to refresh the percentage.
 	*/
-	static void feedback(long int * size, size_t * readed, bool decrypt, unsigned int time);
-
+	static void feedback(unsigned long long int * size, unsigned long long int * readed, bool decrypt, unsigned int time);
+    
 	/**
 		Function to get the filename from a path.
 

@@ -22,54 +22,7 @@
  */
 #include "otp_s7c.hpp"
 
-int otp_s7c::alloc(unsigned char ** buf, unsigned char ** num, size_t size, bool max)
-{
-	if (size < 1) return 0;
-	if (max)
-	{
-		bool done = false;
-		int i = 0;
-		int last_try = 0;
-		for (i = 1; !done && (size / i) > 0; ++i)
-		{
-			try
-			{
-				last_try = (size / i);
-				*buf = (unsigned char *)malloc(sizeof(char) * last_try);
-				*num = (unsigned char *)malloc(sizeof(char) * last_try);
-			}
-			catch (...)
-			{
-				done = false;
-			}
-			if (*buf != NULL && *num != NULL) done = true;
-			else
-			{
-				if (*buf != NULL) free(*buf);
-				if (*num != NULL) free(*num);
-			}
-		}
-		if (!done) return 0;
-		std::cout << "[INFO] Buffers size = " << last_try << std::endl;
-		return last_try;
-	}
-	else
-	{
-		try
-		{
-			*num = (unsigned char *)malloc(sizeof(char) * (size));
-			*buf = (unsigned char *)malloc(sizeof(char) * (size));
-		}
-		catch (...)
-		{
-			return 0;
-		}
-		std::cout << "[INFO] Buffers size = " << size << std::endl;
-		return size;
-	}
-}
-
-void otp_s7c::feedback(long int * size, size_t * readed, bool decrypt, unsigned int time)
+void otp_s7c::feedback(unsigned long long int * size, unsigned long long int * readed, bool decrypt, unsigned int time)
 {
 	
 	float p = 0;
@@ -98,8 +51,9 @@ std::string otp_s7c::GetFileName(std::string path)
 int otp_s7c::crypt(std::string Filename, std::string output)
 {
 	int error = 0;
-	FILE * file = fopen(Filename.c_str(), "rb");
-	if (file)
+    umask(0000);
+    int file = open(Filename.c_str(), O_RDONLY);
+	if (file > 0)
 	{
 		std::string Filename_key = "\0";
 		if (output != "")
@@ -107,128 +61,71 @@ int otp_s7c::crypt(std::string Filename, std::string output)
 			if (output.find_last_of("\"") == output.length() - 1) output = output.substr(0, output.length() - 1);
 			if (output.find_last_of("\\") != std::string::npos) output.append("\\");
 			Filename_key = output;
-			Filename_key.append(otp_s7c::GetFileName(Filename) + ".7ky");
+			Filename_key.append(GetFileName(Filename) + ".7ky");
 		}
 		else Filename_key = Filename + std::string(".7ky");
-		FILE * key_file = fopen(Filename_key.c_str(), "wb");
-		if (key_file)
+		int key_file = open(Filename_key.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0770);
+		if (key_file > 0)
 		{
 			std::string Filename_crypt = "\0";
 			if (output != "")
 			{
 				Filename_crypt = output;
-				Filename_crypt.append(otp_s7c::GetFileName(Filename) + ".7cy");
+				Filename_crypt.append(GetFileName(Filename) + ".7cy");
 			}
 			else Filename_crypt = Filename + std::string(".7cy");
-			FILE * crypt_file = fopen(Filename_crypt.c_str(), "wb");
-			if (crypt_file)
+			int crypt_file = open(Filename_crypt.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0770);
+			if (crypt_file > 0)
 			{
-				unsigned short val = 0;
-				if (_rdrand16_step(&val))
+				unsigned char val[8];
+				if (_rdrand64_step((long long unsigned int *)val))
 				{
-					fseek(file, 0L, SEEK_END);
-					long int size = ftell(file);
-					rewind(file);
-					if (otp_s7c::use_threads)
-					{
-						std::cout << "[WARNING] This is a experimental option (may cause loss of data)!" << std::endl;
-						block * rc = (block *)malloc(sizeof(block));
-						block * cw = (block *)malloc(sizeof(block));
-						block * ck = (block *)malloc(sizeof(block));
-						unsigned int rc_n = 0;
-						unsigned int cw_n = 0;
-						unsigned int ck_n = 0;
-						bool read_done = false;
-						bool calc_done = false;
-						size_t writed = 0;
-						size_t writedk = 0;
-						std::thread calc_t(otp_s7c::calc, rc, cw, ck, &rc_n, &cw_n, &ck_n, &read_done, &calc_done);
-						std::thread write_t(otp_s7c::write, cw, &cw_n, &calc_done, crypt_file, &writed);
-						std::thread writeK_t(otp_s7c::write, ck, &ck_n, &calc_done, key_file, &writedk);
-						char * line = (char *)malloc(sizeof(char) * otp_s7c::buffer_size);
-						std::thread feedback_t(feedback, &size, &writed, false, otp_s7c::percentage_interval);
-						while (!feof(file))
-						{
-							if (rc_n < queue_size)
-							{
-								rc->size = fread(line, sizeof(char), otp_s7c::buffer_size, file);
-								rc->c = (unsigned char *)malloc(sizeof(char) * rc->size);
-								memcpy(rc->c, line, rc->size);
-								rc->next = (block *)malloc(sizeof(block));
-								rc = rc->next;
-								++rc_n;
-							}
-						}
-						read_done = true;
-						calc_t.join();
-						free(rc);
-						write_t.join();
-						writeK_t.join();
-						feedback_t.join();
-						std::cout << "[INFO] Successfuly Crypted!" << std::endl;
-					}
-					else
-					{
-						unsigned char * buf = nullptr;
-						unsigned char * num = nullptr;
-						if (!otp_s7c::buffer_size)
-						{
-							std::cout << "[INFO] Buffers size set to \"auto\"\n";
-							otp_s7c::buffer_size = otp_s7c::alloc(&buf, &num, size, true);
-						}
-						else otp_s7c::buffer_size = otp_s7c::alloc(&buf, &num, (otp_s7c::buffer_size > size ? size : otp_s7c::buffer_size), false);
-						if (otp_s7c::buffer_size)
-						{
-							size_t readed = 0;
-							std::thread feedback_t(feedback, &size, &readed, false, otp_s7c::percentage_interval);
-							while (!feof(file))
-							{
-								size_t read = fread(buf, sizeof(char), otp_s7c::buffer_size, file);
-								for (unsigned long long i = 0; i < read; ++i)
-								{
-									_rdrand16_step(&val);
-									unsigned char rnd = val % 255 + 1;
-									buf[i] += rnd;
-									num[i] = rnd;
-								}
-								fwrite(buf, sizeof(char), read, crypt_file);
-								fwrite(num, sizeof(char), read, key_file);
-								readed += read;
-							}
-							memset(num, 0, otp_s7c::buffer_size);
-							memset(buf, 0, otp_s7c::buffer_size);
-							free(buf);
-							free(num);
-							feedback_t.join();
-							std::cout  << "[INFO] Successfuly Crypted!" << std::endl;
-						}
-						else
-						{
-							std::cerr << "[ERROR] Cannot allocate buffers" << std::endl;
-							error = -5;
-						}
-					}
+                    unsigned long long int file_size = lseek64(file, 0, SEEK_END);
+                    ftruncate64(key_file, file_size);
+                    ftruncate64(crypt_file, file_size);
+                    unsigned char * file_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, file, 0));
+                    unsigned char * key_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, key_file, 0));
+                    unsigned char * crypt_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, crypt_file, 0));
+                    unsigned long long int readed = 0;
+                    std::thread feedback_t(feedback, &file_size, &readed, false, percentage_interval);
+                    short p = 0;
+                    for (unsigned long long int i = 0; i < file_size; i += p, readed += p)
+                    {
+                        _rdrand64_step((long long unsigned int *)val);
+                        for (p = 0; p < 8 && i + p < file_size; ++p)
+                        {
+                            crypt_mmap[i + p] = file_mmap[i + p] + val[p];
+                            key_mmap[i + p] = val[p];
+                        }
+                    }
+                    memset(&val, 0, sizeof(val));
+                    feedback_t.join();
+                    msync(crypt_mmap, file_size, MS_SYNC);
+                    msync(key_mmap, file_size, MS_SYNC);
+                    munmap(file_mmap, file_size);
+                    munmap(key_mmap, file_size);
+                    munmap(crypt_mmap, file_size);
 				}
 				else
 				{
 					std::cerr << "[ERROR] Error generating hardware random value" << std::endl;
 					error = -4;
 				}
-				fclose(key_file);
+				close(key_file);
 			}
 			else
 			{
 				perror("[ERROR] Error opening the output");
 				error = -3;
 			}
-			fclose(crypt_file);
+			close(crypt_file);
 		}
 		else
 		{
 			perror("[ERROR] Error opening the key file");
 			error = -2;
 		}
-		fclose(file);
+		close(file);
 	}
 	else
 	{
@@ -241,83 +138,63 @@ int otp_s7c::crypt(std::string Filename, std::string output)
 int otp_s7c::decrypt(std::string Filename, std::string key, std::string output)
 {
 	int error = 0;
-	FILE * filename_crypt = fopen(Filename.c_str(), "rb");
+	int filename_crypt = open(Filename.c_str(), O_RDONLY);
 	if (filename_crypt)
 	{
-		FILE * filename_key = fopen(key.c_str(), "rb");
+		int filename_key = open(key.c_str(), O_RDONLY);
 		if (filename_key)
 		{
 			if (output != "")
 			{
 				if (output.find_last_of("\"") == (output.length() - 1)) output = output.substr(0, output.length() - 1);
 				if (output.find_last_of("\\") != std::string::npos) output.append("\\");
-				output.append(otp_s7c::GetFileName(Filename));
+				output.append(GetFileName(Filename));
 			}
 			else output = Filename;
 			output.erase(Filename.find_last_of(".7cy") - 3, 5);
-			FILE * filename = fopen(output.c_str(), "wb");
+			int filename = open(output.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0770);
 			if (filename)
 			{
-				fseek(filename_key, 0L, SEEK_END);
-				long int size = ftell(filename_key);
-				fseek(filename_crypt, 0L, SEEK_END);
-				if (size == ftell(filename_crypt))
+                unsigned long long int key_size = lseek64(filename_key, 0, SEEK_END);
+                unsigned long long int crypt_size = lseek64(filename_crypt, 0, SEEK_END);
+                unsigned long long int file_size = lseek64(filename, 0, SEEK_END);
+				if (key_size == crypt_size)
 				{
-					rewind(filename_key);
-					rewind(filename_crypt);
-					unsigned char * buf = nullptr;
-					unsigned char * num = nullptr;
-					if (!otp_s7c::buffer_size)
-					{
-						std::cout << "[INFO] Buffers size set to \"max\"" << std::endl;
-						otp_s7c::buffer_size = alloc(&buf, &num, size, true);
-					}
-					else otp_s7c::buffer_size = alloc(&buf, &num, (otp_s7c::buffer_size > size ? size : otp_s7c::buffer_size), false);
-					if (otp_s7c::buffer_size)
-					{
-						size_t readed = 0;
-						std::thread feedback_t(feedback, &size, &readed, true, otp_s7c::percentage_interval);
-						while (!feof(filename_crypt) || !feof(filename_key))
-						{
-							size_t read_c = fread(buf, sizeof(char), otp_s7c::buffer_size, filename_crypt);
-							/*size_t read_k = */fread(num, sizeof(char), otp_s7c::buffer_size, filename_key);
-							readed += read_c;
-							for (size_t i = 0; i < read_c; ++i) buf[i] -= num[i];
-							fwrite(buf, sizeof(char), read_c, filename);
-						}
-						memset(num, 0, otp_s7c::buffer_size);
-						memset(buf, 0, otp_s7c::buffer_size);
-						free(buf);
-						free(num);
-						feedback_t.join();
-						std::cout << "[INFO] Successfuly decrypted!" << std::endl;
-					}
-					else
-					{
-						std::cerr << "[ERROR] Cannot allocate buffers" << std::endl;
-						error = -5;
-					}
+                    ftruncate64(filename, key_size);
+                    unsigned char * file_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, filename, 0));
+                    unsigned char * key_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, filename_key, 0));
+                    unsigned char * crypt_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, filename_crypt, 0));
+                    unsigned long long int readed = 0;
+                    std::thread feedback_t(feedback, &file_size, &readed, true, percentage_interval);
+                    for (unsigned long long int i = 0; i < file_size; ++i, ++readed) file_mmap[i] = crypt_mmap[i] - key_mmap[i];
+                    msync(crypt_mmap, file_size, MS_SYNC);
+                    msync(key_mmap, file_size, MS_SYNC);
+                    munmap(file_mmap, file_size);
+                    munmap(key_mmap, file_size);
+                    munmap(crypt_mmap, file_size);
+                    feedback_t.join();
+                    std::cout << "[INFO] Successfuly decrypted!" << std::endl;
 				}
 				else
 				{
 					std::cerr << "[ERROR] Crypt-Key pair don't match!" << std::endl;
 					error = -6;
 				}
-				fclose(filename);
+				close(filename);
 			}
 			else
 			{
 				perror("[ERROR] Error opening the output file");
 				error = -3;
 			}
-			fclose(filename_key);
+			close(filename_key);
 		}
 		else
 		{
 			perror("[ERROR] Error opening the key file");
 			error = -2;
 		}
-		fclose(filename_crypt);
+		close(filename_crypt);
 	}
 	else
 	{
@@ -325,58 +202,4 @@ int otp_s7c::decrypt(std::string Filename, std::string key, std::string output)
 		error = -1;
 	}
 	return error;
-}
-
-void otp_s7c::calc(block * rc, block * cw, block * ck, unsigned int * rc_n, unsigned int * cw_n, unsigned int * ck_n, bool * read_done, bool * calc_done)
-{
-	while (!*read_done || *rc_n > 0)
-	{
-		while (*rc_n > 0)
-		{
-			cw->c = (unsigned char *)malloc(sizeof(char) * rc->size);
-			ck->c = (unsigned char *)malloc(sizeof(char) * rc->size);
-			for (unsigned int i = 0; i < rc->size; ++i)
-			{
-				unsigned short val = 0;
-				_rdrand16_step(&val);
-				unsigned char rnd = val % 255 + 1;
-				cw->c[i] = rc->c[i] + rnd;
-				ck->c[i] = rnd;
-			}
-			cw->size = rc->size;
-			ck->size = rc->size;
-			block * rc_tmp = rc;
-			rc = rc->next;
-			free(rc_tmp->c);
-			free(rc_tmp);
-			cw->next = (block *)malloc(sizeof(block));
-			cw = cw->next;
-			ck->next = (block *)malloc(sizeof(block));
-			ck = ck->next;
-			--*rc_n;
-			++*cw_n;
-			++*ck_n;
-		}
-	}
-	*calc_done = true;
-	return;
-}
-
-void otp_s7c::write(block * cw, unsigned int * cw_n, bool * calc_done, FILE * d, size_t * writed)
-{
-	block * cw_w = cw;
-	while (!*calc_done || *cw_n > 0)
-	{
-		while (*cw_n > 0)
-		{
-			fwrite(cw_w->c, sizeof(char), cw_w->size, d);
-			*writed += cw_w->size;
-			block * cw_tmp = cw_w;
-			cw_w = cw_w->next;
-			free(cw_tmp->c);
-			free(cw_tmp);
-			--*cw_n;
-		}
-	}
-	return;
 }

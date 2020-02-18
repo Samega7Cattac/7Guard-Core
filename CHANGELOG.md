@@ -8,16 +8,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 - Makefile config file
 - Doxygen config file
+- MacOS compatibility TODO
+- Support for folders TODO
 
 ### Fixed
 - Not outputing bug fixed
 - Copyrights fixed
 - Discord tag updated
+- Huge performance increase
+- Windows compatibility TODO
 
 ### Changed
 - arguments convertition updated
 - Errors go to stderr buffer
 - Documentation updated
+- Files writing method
+
+### Removed
+- threads Implementation removed
+- buffer implementation removed
 
 ## [v1.2] - 2018-12-11
 ### Added

@@ -11,8 +11,8 @@
 \DoxyCodeLine{git clone https://github.com/Samega7Cattac/7Guard-\/Core.git}
 \DoxyCodeLine{make}
 \end{DoxyCode}
- And you should have {\ttfamily 7Guard} inside {\ttfamily ./build} folder.\hypertarget{md_README_autotoc_md20}{}\doxysection{How it works}\label{md_README_autotoc_md20}
-7Guard use a encryption tecnique called \href{https://en.wikipedia.org/wiki/One-time_pad}{\texttt{ O\+TP}} (One-\/\+Time-\/\+Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number used to the key file.
+ And you should have {\ttfamily 7Guard} inside {\ttfamily build} folder. Works on Linux, Windows and Mac\+OS.\hypertarget{md_README_autotoc_md20}{}\doxysection{How it works}\label{md_README_autotoc_md20}
+7Guard uses a encryption tecnique called \href{https://en.wikipedia.org/wiki/One-time_pad}{\texttt{ O\+TP}} (One-\/\+Time-\/\+Pad) which sums the bytes from the file with a random number, saving the sum to the crypted file and the random number will be used as the key file.
 
 
 \begin{DoxyCode}{0}
@@ -23,7 +23,7 @@
 \end{DoxyCode}
 
 
-To decrypt it\textquotesingle{}s just inverting the sum.
+To decrypt it\textquotesingle{}s just inverting the process.
 
 
 \begin{DoxyCode}{0}
@@ -31,11 +31,17 @@ To decrypt it\textquotesingle{}s just inverting the sum.
 \end{DoxyCode}
 
 
-The problems with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.
-
-1) The problem was solved by using the Intel functions to generate random numbers in hardware level (more info \href{https://en.wikipedia.org/wiki/RdRand}{\texttt{ here}}).
-
-2) In this version you need to deal with it. I\textquotesingle{}m already working on a implemetation with a server (more for enterprise use) where the keys will be stored on the enterprise server.\hypertarget{md_README_autotoc_md21}{}\doxysection{Usage}\label{md_README_autotoc_md21}
+The issues with this tecnique are\+:
+\begin{DoxyItemize}
+\item Generation of truly random numbers
+\begin{DoxyItemize}
+\item The problem was solved by using the Intel functions to generate random numbers in hardware level (more info \href{https://en.wikipedia.org/wiki/RdRand}{\texttt{ here}}).
+\end{DoxyItemize}
+\item The crypted and key file will have the same size of the original one.
+\begin{DoxyItemize}
+\item In this version you need to deal with it. I\textquotesingle{}m already working on a implemetation with a server (more for enterprise use) where the keys will be stored on the enterprise server.
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md21}{}\doxysection{Usage}\label{md_README_autotoc_md21}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{Options:}
@@ -44,12 +50,12 @@ The problems with this tecnique are 1.) Generation of truly random numbers, and 
 \DoxyCodeLine{        -\/key -\/ path to the key file (only with "-\/decrypt")}
 \DoxyCodeLine{        -\/h -\/ display this help message}
 \DoxyCodeLine{Usage:}
-\DoxyCodeLine{        7Guard\_CLI\_v1b.exe [ -\/crypt <file\_to\_crypt.*> | -\/decrypt <file\_to\_decrypt.7cy> -\/key <file\_with\_key.7ky]}
+\DoxyCodeLine{        7Guard [ -\/crypt <file\_to\_crypt.*> | -\/decrypt <file\_to\_decrypt.7cy> -\/key <file\_with\_key.7ky]}
 \DoxyCodeLine{}
 \DoxyCodeLine{Optional:}
 \DoxyCodeLine{        -\/o -\/ Path to output folder}
-\DoxyCodeLine{        -\/i -\/ percentage refresh time in sec}
-\DoxyCodeLine{        -\/-\/buf -\/ specify the size used each of the 2 buffers (O = max)}
+\DoxyCodeLine{        -\/i -\/ percentage refresh time in secs}
+\DoxyCodeLine{        -\/-\/buf -\/ specify the size used for each of the 2 buffers (O = max)}
 \DoxyCodeLine{        -\/-\/threads -\/ EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)}
 \DoxyCodeLine{                (Only high-\/end CPUs recomendaded)}
 \end{DoxyCode}

@@ -82,19 +82,26 @@ Requirements</h1>
 Build</h1>
 <div class="fragment"><div class="line">git clone https://github.com/Samega7Cattac/7Guard-Core.git</div>
 <div class="line">make</div>
-</div><!-- fragment --><p> And you should have <code>7Guard</code> inside <code>./build</code> folder.</p>
+</div><!-- fragment --><p> And you should have <code>7Guard</code> inside <code>build</code> folder. Works on Linux, Windows and MacOS.</p>
 <h1><a class="anchor" id="autotoc_md20"></a>
 How it works</h1>
-<p>7Guard use a encryption tecnique called <a href="https://en.wikipedia.org/wiki/One-time_pad">OTP</a> (One-Time-Pad) witch sum the byte from the file with a random number, saving the sum to the crypted file and the random number used to the key file.</p>
+<p>7Guard uses a encryption tecnique called <a href="https://en.wikipedia.org/wiki/One-time_pad">OTP</a> (One-Time-Pad) which sums the bytes from the file with a random number, saving the sum to the crypted file and the random number will be used as the key file.</p>
 <div class="fragment"><div class="line">file_to_crypt + random_number = crypted_file</div>
 <div class="line">                      |               |</div>
 <div class="line">                      |                --&gt;Stored in crypted file (*.7cy)</div>
 <div class="line">                       ------------------&gt;Stored in key file (*.7ky)</div>
-</div><!-- fragment --><p>To decrypt it's just inverting the sum.</p>
+</div><!-- fragment --><p>To decrypt it's just inverting the process.</p>
 <div class="fragment"><div class="line">original_file = crypted_file - random_number</div>
-</div><!-- fragment --><p>The problems with this tecnique are 1.) Generation of truly random numbers, and 2.) The crypted and key file will have the same size of the original one.</p>
-<p>1) The problem was solved by using the Intel functions to generate random numbers in hardware level (more info <a href="https://en.wikipedia.org/wiki/RdRand">here</a>).</p>
-<p>2) In this version you need to deal with it. I'm already working on a implemetation with a server (more for enterprise use) where the keys will be stored on the enterprise server.</p>
+</div><!-- fragment --><p>The issues with this tecnique are:</p><ul>
+<li>Generation of truly random numbers<ul>
+<li>The problem was solved by using the Intel functions to generate random numbers in hardware level (more info <a href="https://en.wikipedia.org/wiki/RdRand">here</a>).</li>
+</ul>
+</li>
+<li>The crypted and key file will have the same size of the original one.<ul>
+<li>In this version you need to deal with it. I'm already working on a implemetation with a server (more for enterprise use) where the keys will be stored on the enterprise server.</li>
+</ul>
+</li>
+</ul>
 <h1><a class="anchor" id="autotoc_md21"></a>
 Usage</h1>
 <div class="fragment"><div class="line">Options:</div>
@@ -103,12 +110,12 @@ Usage</h1>
 <div class="line">        -key - path to the key file (only with &quot;-decrypt&quot;)</div>
 <div class="line">        -h - display this help message</div>
 <div class="line">Usage:</div>
-<div class="line">        7Guard_CLI_v1b.exe [ -crypt &lt;file_to_crypt.*&gt; | -decrypt &lt;file_to_decrypt.7cy&gt; -key &lt;file_with_key.7ky]</div>
+<div class="line">        7Guard [ -crypt &lt;file_to_crypt.*&gt; | -decrypt &lt;file_to_decrypt.7cy&gt; -key &lt;file_with_key.7ky]</div>
 <div class="line"> </div>
 <div class="line">Optional:</div>
 <div class="line">        -o - Path to output folder</div>
-<div class="line">        -i - percentage refresh time in sec</div>
-<div class="line">        --buf - specify the size used each of the 2 buffers (O = max)</div>
+<div class="line">        -i - percentage refresh time in secs</div>
+<div class="line">        --buf - specify the size used for each of the 2 buffers (O = max)</div>
 <div class="line">        --threads - EXPERIMENTAL, uses threads with a limited number of blocks in queue (O = default)</div>
 <div class="line">                (Only high-end CPUs recomendaded)</div>
 </div><!-- fragment --><p><code>make</code> options: </p><div class="fragment"><div class="line">make        - build targeted for release</div>

@@ -14,7 +14,8 @@
 git clone https://github.com/Samega7Cattac/7Guard-Core.git
 make
 ```
-And you should have `7Guard` inside `./build` folder.
+And you should have `7Guard` inside `build` folder.
+Works on Linux, Windows and MacOS.
 
 ## How it works
 

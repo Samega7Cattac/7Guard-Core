@@ -131,41 +131,6 @@ int main(int argc, char * argv[])
 					return -9;
 				}
 			}
-			else if ((std::string)argv[i] == "--buf")
-			{
-				if (!(argc < i + 1))
-				{
-					t = std::from_chars(argv[++i], argv[i] + strlen(argv[i]), s7c.buffer_size, 10);
-					if(t.ec == std::errc::invalid_argument || t.ec == std::errc::result_out_of_range)
-					{
-						std::cerr << "[ERROR] Invalid \"--buf\" value!" << std::endl;
-						return -9;
-					}
-				}
-				else
-				{
-					std::cerr << "[ERROR] Missing \"--buf\" value!" << std::endl;
-					return -9;
-				}
-			}
-			else if ((std::string)argv[i] == "--threads")
-			{
-				if (!(argc < i + 1))
-				{
-					t = std::from_chars(argv[++i], argv[i] + strlen(argv[i]), s7c.queue_size, 10);
-					s7c.use_threads = true;
-					if(t.ec == std::errc::invalid_argument || t.ec == std::errc::result_out_of_range)
-					{
-						std::cerr << "[ERROR] Invalid \"--threads\" value!" << std::endl;
-						return -9;
-					}
-				}
-				else
-				{
-					std::cerr << "[ERROR] Missing \"--threads\" value!" << std::endl;
-					return -9;
-				}
-			}
 			else if ((std::string)argv[i] == "-h") h = true;
 			else
 			{
@@ -193,7 +158,6 @@ int main(int argc, char * argv[])
 				std::cerr << "[ERROR] Missing \"-key\" option!" << std::endl;
 				return -9;
 			}
-			else if (s7c.use_threads) std::cerr << "[WARNING] \"--threads\" option will be ignored" << std::endl;
 			std::cout << "[INFO] Initializing..." << std::endl;
 			return s7c.decrypt(argv[decrypt], argv[key], (o ? argv[o] : ""));
 		}
