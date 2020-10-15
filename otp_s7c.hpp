@@ -23,8 +23,10 @@
 #ifndef OTP_S7C_H
 #define OTP_S7C_H
 
-#if defined(_M_AMD64) && defined(_WIN32)
-#define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
+#ifdef _WIN32
+// #define _CRT_SECURE_NO_WARNINGS // Thanks Microsoft
+#include <io.h>
+#include <winbase.h>
 #elif __linux__
 #include <sys/mman.h>
 #include <sys/stat.h>

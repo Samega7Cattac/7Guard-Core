@@ -51,10 +51,15 @@ std::string otp_s7c::GetFileName(std::string path)
 int otp_s7c::crypt(std::string Filename, std::string output)
 {
 	int error = 0;
-    umask(0000);
+#ifdef _WIN32
+    HANDLE file CreateFileA(Filename.c_str(), GENERIC_READ, 0, NULL, OPEN_ALWAYS, FILE_FLAG_NO_BUFFERING, NULL);
+    if (file != INVALID_HANDLE_VALUE)
+    {
+#elif __linux__
     int file = open(Filename.c_str(), O_RDONLY);
-	if (file > 0)
+    if (file > 0)
 	{
+#endif
 		std::string Filename_key = "\0";
 		if (output != "")
 		{
@@ -64,9 +69,15 @@ int otp_s7c::crypt(std::string Filename, std::string output)
 			Filename_key.append(GetFileName(Filename) + ".7ky");
 		}
 		else Filename_key = Filename + std::string(".7ky");
+#ifdef _WNI32
+        HANDLE key_file CreateFileA(Filename_key.c_str(), GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_FLAG_NO_BUFFERING, NULL);
+        if (key_file != INVALID_HANDLE_VALUE)
+        {
+#elif __linux__
 		int key_file = open(Filename_key.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0770);
 		if (key_file > 0)
 		{
+#endif
 			std::string Filename_crypt = "\0";
 			if (output != "")
 			{
@@ -74,18 +85,37 @@ int otp_s7c::crypt(std::string Filename, std::string output)
 				Filename_crypt.append(GetFileName(Filename) + ".7cy");
 			}
 			else Filename_crypt = Filename + std::string(".7cy");
+#ifdef _WIN32
+            HANDLE crypt_file CreateFileA(Filename_key.c_str(), GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_FLAG_NO_BUFFERING, NULL);
+            if (crypt_file != INVALID_HANDLE_VALUE)
+            {
+#elif __linux__
 			int crypt_file = open(Filename_crypt.c_str(), O_CREAT | O_RDWR | O_TRUNC, 0770);
 			if (crypt_file > 0)
 			{
+#endif
 				unsigned char val[8];
 				if (_rdrand64_step((long long unsigned int *)val))
 				{
+#ifdef _WIN32
+                    unsigned long long int file_size = _filelengthi64(file);
+                    if (_chsize_s(key_file, file_size)) return -5;
+                    if (_chsize_s(crypt_file, file_size)) return -5;
+                    HANDLE file_mmap = CreateFileMappingA(file, NULL, PAGE_READONLY, file_size, file_size, NULL);
+                    HANDLE key_mmap = CreateFileMappingA(key_file, NULL, PAGE_WRITEONLY, file_size, file_size, NULL);
+                    HANDLE crypt_mmap = CreateFileMappingA(crypt_file, NULL, PAGE_WRITEONLY, file_size, file_size, NULL);
+                    if (file_mmap != INVALID_HANDLE_VALUE) return -6;
+                    if (key_mmap != INVALID_HANDLE_VALUE) return -6;
+                    if (crypt_mmap != INVALID_HANDLE_VALUE) return -6;
+                    MapViewOfFileEx(file_mmap, FILE_MAP_READ);
+#elif __linux__
                     unsigned long long int file_size = lseek64(file, 0, SEEK_END);
                     ftruncate64(key_file, file_size);
                     ftruncate64(crypt_file, file_size);
                     unsigned char * file_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, file, 0));
                     unsigned char * key_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, key_file, 0));
                     unsigned char * crypt_mmap = static_cast<unsigned char *>(mmap64(nullptr, file_size, PROT_WRITE | PROT_READ, MAP_SHARED/*MAP_PRIVATE*/, crypt_file, 0));
+#endif
                     unsigned long long int readed = 0;
                     std::thread feedback_t(feedback, &file_size, &readed, false, percentage_interval);
                     short p = 0;
