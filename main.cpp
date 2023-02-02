@@ -202,7 +202,7 @@ void cred()
 	std::cout << "7Guard - OTP encryption software" << '\n';
 	std::cout << "By: Samega 7Cattac" << '\n';
 	std::cout << '\n' << "GitHub: https://github.com/Samega7Cattac/7Guard-Core/" << '\n';
-	std::cout << "Discord: Samega 7Cattac#5966" << '\n';
+	std::cout << "Discord: Samega 7Cattac#5961" << '\n';
 	std::cout << '\n' << "use option \"-h\" for help" << '\n';
 	std::cout << "\n\t" << "7Guard Copyright (C) 2019 Samega 7Cattac" << std::endl;
     std::cout << "This program comes with ABSOLUTELY NO WARRANTY" << std::endl;
